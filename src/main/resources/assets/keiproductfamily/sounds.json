@@ -1,0 +1,26 @@
+{
+  "pee": {
+    "category": "player",
+    "sounds": [
+      {
+        "name": "keiproductfamily:pee"
+      }
+    ]
+  },
+  "pee_shot": {
+    "category": "player",
+    "sounds": [
+      {
+        "name": "keiproductfamily:pee_shot"
+      }
+    ]
+  },
+  "TrainApproach": {
+    "category": "player",
+    "sounds": [
+      {
+        "name": "keiproductfamily:trainapproach"
+      }
+    ]
+  }
+}

@@ -1,0 +1,16 @@
+[
+{
+  "modid": "keiproductfamily",
+  "name": "Kuma Electric Industry Product Family",
+  "description": "Chunk Loader, Control by Redstone.",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "",
+  "updateUrl": "",
+  "authorList": ["kuma_yamamoto"],
+  "credits": "",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]

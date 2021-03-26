@@ -1,0 +1,10 @@
+tile.ChunkLoaderBlock.name=Chunk Loader
+tile.AdvanceChunkLoaderBlock.name=Advance Chunk Loader
+item.TAWReceiveItem.name=Train Approach Warning Receiver Item
+tile.TAWReceiveBlock.name=Train Approach Warning Receiver Block
+item.TAWSendItem.name=Train Approach Warning Sender Item
+item.TPRReceiveItem.name=Train Protection Radio Receiver Item
+item.TPRSendItem.name=Train Protection Radio Sender Item
+tile.TPRSendBlock.name=Train Protection Radio Sender Block
+
+Kuma Electric Industry Product Family=Kuma Electric Industry Product Family

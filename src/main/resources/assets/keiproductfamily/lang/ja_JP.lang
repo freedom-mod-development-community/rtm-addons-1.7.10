@@ -1,0 +1,10 @@
+tile.ChunkLoaderBlock.name=レッドストーン制御チャンクローダー
+tile.AdvanceChunkLoaderBlock.name=アドバンス レッドストーン制御チャンクローダー
+item.TAWReceiveItem.name=列車接近警報受信機アイテム
+tile.TAWReceiveBlock.name=列車接近警報受信機ブロック
+item.TAWSendItem.name=列車接近送信機アイテム
+item.TPRReceiveItem.name=列車防護無線受信機アイテム
+item.TPRSendItem.name=列車防護無線送信機アイテム
+tile.TPRSendBlock.name=列車防護無線送信機ブロック
+
+Kuma Electric Industry Product Family=kuma電気工業製品群
