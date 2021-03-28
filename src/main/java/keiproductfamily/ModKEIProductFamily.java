@@ -9,9 +9,12 @@ import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
 import cpw.mods.fml.common.network.NetworkRegistry;
+import cpw.mods.fml.common.registry.GameRegistry;
 import keiproductfamily.PermissionList.IParmission;
 import keiproductfamily.PermissionList.PermissionCompanyList;
 import keiproductfamily.network.PacketHandler;
+import keiproductfamily.rtmAddons.SCWirelessAdvance.BlockSCWirelessAdvance;
+import keiproductfamily.rtmAddons.SCWirelessAdvance.TileEntitySC_WirelessAdvance;
 import net.minecraft.block.Block;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.nbt.NBTTagCompound;
@@ -49,6 +52,9 @@ public class ModKEIProductFamily {
 //        GameRegistry.registerItem(new TPRReceiveItem(), "TPRReceiveItem");
 //        GameRegistry.registerBlock(new TPRSendBlock(), "TPRSendBlock");
 //        GameRegistry.registerTileEntity(TPRSendBlockTile.class, "TPRSendTile");
+        creativeTabIcon = new BlockSCWirelessAdvance();
+        GameRegistry.registerBlock(creativeTabIcon, "BlockSCWirelessAdvance");
+        GameRegistry.registerTileEntity(TileEntitySC_WirelessAdvance.class, "TileEntitySC_WirelessAdvance");
 
 
         ForgeChunkManager.setForcedChunkLoadingCallback(this, new ForgeChunkManager.LoadingCallback() {
@@ -82,6 +88,7 @@ public class ModKEIProductFamily {
         if (!event.world.isRemote) {
             PermissionCompanyList.read();
         }
+        TileEntitySC_WirelessAdvance.initLastLevel_MAP();
     }
 
     @SubscribeEvent
