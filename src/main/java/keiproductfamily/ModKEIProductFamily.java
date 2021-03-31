@@ -3,20 +3,25 @@ package keiproductfamily;
 
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod;
+import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
 import cpw.mods.fml.common.network.NetworkRegistry;
+import cpw.mods.fml.common.registry.EntityRegistry;
 import cpw.mods.fml.common.registry.GameRegistry;
 import keiproductfamily.PermissionList.IParmission;
 import keiproductfamily.PermissionList.PermissionCompanyList;
 import keiproductfamily.network.PacketHandler;
-import keiproductfamily.rtmAddons.SCWirelessAdvance.BlockSCWirelessAdvance;
-import keiproductfamily.rtmAddons.SCWirelessAdvance.TileEntitySC_WirelessAdvance;
+import keiproductfamily.rtmAddons.scWirelessAdvance.BlockSCWirelessAdvance;
+import keiproductfamily.rtmAddons.scWirelessAdvance.TileEntitySC_WirelessAdvance;
+import keiproductfamily.rtmAddons.trainDetector.EntityTrainDetectorAdvance;
+import keiproductfamily.rtmAddons.trainDetector.ItemTrainDetectorAdvance;
 import net.minecraft.block.Block;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.item.Item;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
@@ -34,8 +39,14 @@ public class ModKEIProductFamily {
     public static final String DOMAIN = "keiproductfamily";
     @Mod.Instance("KEIProductFamily")
     public static ModKEIProductFamily instance;
+
+    @SidedProxy(clientSide = "keiproductfamily.KEIClientProxy", serverSide = "keiproductfamily.KEICommonProxy")
+    public static KEIProxy proxy;
+
+
     public static Block creativeTabIcon;
     public static CreativeTabs keipfCreativeTabs = new CreativeTabKEIPF();
+    public static Item itemTrainDetectorAdvance = new ItemTrainDetectorAdvance();
 
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
@@ -55,6 +66,7 @@ public class ModKEIProductFamily {
         creativeTabIcon = new BlockSCWirelessAdvance();
         GameRegistry.registerBlock(creativeTabIcon, "BlockSCWirelessAdvance");
         GameRegistry.registerTileEntity(TileEntitySC_WirelessAdvance.class, "TileEntitySC_WirelessAdvance");
+        GameRegistry.registerItem(itemTrainDetectorAdvance, "itemTrainDetectorAdvance");
 
 
         ForgeChunkManager.setForcedChunkLoadingCallback(this, new ForgeChunkManager.LoadingCallback() {
@@ -76,10 +88,12 @@ public class ModKEIProductFamily {
         FMLCommonHandler.instance().bus().register(this);
         MinecraftForge.EVENT_BUS.register(this);
         PacketHandler.init();
+        proxy.preInit();
     }
 
     @Mod.EventHandler
     public void init(FMLInitializationEvent event) {
+        EntityRegistry.registerModEntity(EntityTrainDetectorAdvance.class, "EntityTrainDetectorAdvance", 301, ModKEIProductFamily.instance, 1024, 3, false);
         NetworkRegistry.INSTANCE.registerGuiHandler(instance, new GuiHandler());
     }
 
