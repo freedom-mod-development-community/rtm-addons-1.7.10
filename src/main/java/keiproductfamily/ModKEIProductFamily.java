@@ -15,6 +15,8 @@ import cpw.mods.fml.common.registry.GameRegistry;
 import keiproductfamily.PermissionList.IParmission;
 import keiproductfamily.PermissionList.PermissionCompanyList;
 import keiproductfamily.network.PacketHandler;
+import keiproductfamily.rtmAddons.receiverBlock.receiverTrafficLights.ReceiverTrafficLightBlock;
+import keiproductfamily.rtmAddons.receiverBlock.receiverTrafficLights.ReceiverTrafficLightTile;
 import keiproductfamily.rtmAddons.scWirelessAdvance.BlockSCWirelessAdvance;
 import keiproductfamily.rtmAddons.scWirelessAdvance.TileEntitySC_WirelessAdvance;
 import keiproductfamily.rtmAddons.trainDetector.EntityTrainDetectorAdvance;
@@ -67,6 +69,9 @@ public class ModKEIProductFamily {
         GameRegistry.registerBlock(creativeTabIcon, "BlockSCWirelessAdvance");
         GameRegistry.registerTileEntity(TileEntitySC_WirelessAdvance.class, "TileEntitySC_WirelessAdvance");
         GameRegistry.registerItem(itemTrainDetectorAdvance, "itemTrainDetectorAdvance");
+
+        GameRegistry.registerBlock(ModCommonVar.receiverTrafficLightBlock, "ReceiverTrafficLightBlock");
+        GameRegistry.registerTileEntity(ReceiverTrafficLightTile.class, "ReceiverTrafficLightTile");
 
 
         ForgeChunkManager.setForcedChunkLoadingCallback(this, new ForgeChunkManager.LoadingCallback() {

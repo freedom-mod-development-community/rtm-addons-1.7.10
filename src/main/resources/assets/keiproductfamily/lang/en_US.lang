@@ -6,5 +6,13 @@ item.TAWSendItem.name=Train Approach Warning Sender Item
 item.TPRReceiveItem.name=Train Protection Radio Receiver Item
 item.TPRSendItem.name=Train Protection Radio Sender Item
 tile.TPRSendBlock.name=Train Protection Radio Sender Block
+tile.ReceiverTrafficLight.name=Receiver Block for Traffic Light
 
 Kuma Electric Industry Product Family=Kuma Electric Industry Product Family
+
+HIGH_SPEED_PROCEED=HIGH SPEED PROCEED
+PROCEED=PROCEED
+SLOW_DOWN=SLOW DOWN
+CAUTION=CAUTION
+VIGILANCE=VIGILANCE
+STOP=STOP

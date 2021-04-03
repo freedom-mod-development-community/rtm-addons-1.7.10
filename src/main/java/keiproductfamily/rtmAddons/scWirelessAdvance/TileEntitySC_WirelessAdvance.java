@@ -63,7 +63,6 @@ public class TileEntitySC_WirelessAdvance extends TileEntitySignalConverter impl
             this.updateChunks();
         }
         setWirelessSignal(this.xCoord, this.yCoord, this.zCoord, lastLevel_MAP.getOrDefault(this.getChannel(), 0));
-        NGTLog.debug("TESC validate");
     }
 
     public int getChannel() {

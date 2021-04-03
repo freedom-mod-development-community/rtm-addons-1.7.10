@@ -21,7 +21,7 @@ abstract class TileEntityMessage : IMessage {
         read(buf)
     }
 
-    protected abstract fun read(buf: ByteBuf?)
+    protected abstract fun read(buf: ByteBuf)
     override fun toBytes(buf: ByteBuf) {
         buf.writeInt(pos!!.x)
         buf.writeInt(pos!!.y)
@@ -29,7 +29,7 @@ abstract class TileEntityMessage : IMessage {
         write(buf)
     }
 
-    protected abstract fun write(buf: ByteBuf?)
+    protected abstract fun write(buf: ByteBuf)
     protected fun getWorld(ctx: MessageContext): World {
         return ctx.currentWorld
     }

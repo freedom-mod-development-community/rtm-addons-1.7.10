@@ -27,8 +27,8 @@ public class GuiTrainDetectorAdvance extends GuiScreenCustom {
 
         this.textFields.clear();
         this.signalValues = new GuiTextField[2];
-        this.signalValues[0] = this.setTextField(this.width / 2 - 60 + i0, 100, 40, 20, entityTDAdvance.getChannelName());
-        this.signalValues[1] = this.setTextField(this.width / 2 + 20 + i0, 100, 40, 20, String.valueOf(entityTDAdvance.getChannelNumber()));
+        this.signalValues[0] = this.setTextField(this.width / 2 - 60 + i0, 100, 40, 20, entityTDAdvance.getChannelKeyPair().getName());
+        this.signalValues[1] = this.setTextField(this.width / 2 + 20 + i0, 100, 40, 20, String.valueOf(entityTDAdvance.getChannelKeyPair().getNumber()));
 
     }
 
@@ -61,9 +61,11 @@ public class GuiTrainDetectorAdvance extends GuiScreenCustom {
         if (this.currentTextField != null) {
             if (this.currentTextField == signalValues[0]) {
                 if (par2 == Keyboard.KEY_TAB) {
+                    currentTextField.setFocused(false);
                     currentTextField = signalValues[1];
                     currentTextField.setText("");
                     currentTextField.setFocused(true);
+                    currentTextField.setCursorPosition(0);
                 } else {
                     this.currentTextField.textboxKeyTyped(Character.toUpperCase(par1), par2);
                     if (currentTextField.getText().length() > 3) {

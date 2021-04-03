@@ -6,5 +6,13 @@ item.TAWSendItem.name=列車接近送信機アイテム
 item.TPRReceiveItem.name=列車防護無線受信機アイテム
 item.TPRSendItem.name=列車防護無線送信機アイテム
 tile.TPRSendBlock.name=列車防護無線送信機ブロック
+tile.ReceiverTrafficLight.name=信号機用受信ブロック
 
 Kuma Electric Industry Product Family=kuma電気工業製品群
+
+HIGH_SPEED_PROCEED=高速進行
+PROCEED=進行
+SLOW_DOWN=減速
+CAUTION=注意
+VIGILANCE=警戒
+STOP=停止
