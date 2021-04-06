@@ -45,7 +45,7 @@ public class GuiTrainDetectorAdvance extends GuiScreenCustom {
 
     private void sendPacket() {
         this.formatSignalLevel();
-        PacketHandler.sendPacketServer(new MessageTrainDetectorAdvance(this.entityTDAdvance.getEntityId(), signalValues[0].getText(), Integer.parseInt(signalValues[1].getText())));
+        PacketHandler.sendPacketServer(new MessageTrainDetectorAdvance(this.entityTDAdvance.getEntityId(), signalValues[0].getText(), signalValues[1].getText()));
     }
 
     private void formatSignalLevel() {
@@ -66,7 +66,7 @@ public class GuiTrainDetectorAdvance extends GuiScreenCustom {
                     currentTextField.setText("");
                     currentTextField.setFocused(true);
                     currentTextField.setCursorPosition(0);
-                } else {
+                } else if(!KeyboardUtil.isIntegerKey(par2) || par2 == 14){
                     this.currentTextField.textboxKeyTyped(Character.toUpperCase(par1), par2);
                     if (currentTextField.getText().length() > 3) {
                         currentTextField.setText(currentTextField.getText().substring(0, 3));

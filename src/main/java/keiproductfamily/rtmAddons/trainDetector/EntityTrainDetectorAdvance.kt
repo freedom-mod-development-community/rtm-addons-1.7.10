@@ -5,23 +5,20 @@ import jp.ngt.rtm.electric.SignalLevel
 import jp.ngt.rtm.entity.train.EntityBogie
 import jp.ngt.rtm.entity.train.EntityTrainBase
 import jp.ngt.rtm.item.ItemWire
-import keiproductfamily.GuiIDs
-import keiproductfamily.ModCommonVar
-import keiproductfamily.ModKEIProductFamily
+import keiproductfamily.*
 import keiproductfamily.network.PacketHandler
 import keiproductfamily.rtmAddons.ChannelKeyPair
-import keiproductfamily.rtmAddons.RTMAChannelMaster.getChannelData
 import keiproductfamily.rtmAddons.RequestEntityNBTData
+import keiproductfamily.rtmAddons.detectorChannel.RTMDetectorChannelMaster
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.world.World
-import java.nio.channels.Channel
 
 class EntityTrainDetectorAdvance(world: World?) : EntityElectricalWiring(world) {
     private var findTrain = false
-    var channelKeyPair: ChannelKeyPair = ChannelKeyPair("", 0)
+    var channelKeyPair: ChannelKeyPair = ChannelKeyPair("", "")
 
     override fun entityInit() {
         super.entityInit()
@@ -36,32 +33,30 @@ class EntityTrainDetectorAdvance(world: World?) : EntityElectricalWiring(world) 
 
     public override fun writeEntityToNBT(nbt: NBTTagCompound) {
         super.writeEntityToNBT(nbt)
-        nbt.setString("channelName", channelKeyPair.name)
-        nbt.setInteger("channelNumber", channelKeyPair.number)
+        nbt.setChannelKeyPair("channelKeyPair", channelKeyPair)
     }
 
     public override fun readEntityFromNBT(nbt: NBTTagCompound) {
-        channelKeyPair = ChannelKeyPair(nbt.getString("channelName"), nbt.getInteger("channelNumber"))
-        super.readEntityFromNBT(nbt)
+        channelKeyPair = nbt.getChannelKeyPair("channelKeyPair")
     }
 
     val channelKey: String
         get() = channelKeyPair.getKey()
 
-    fun setChunnelName(chunnelName: String, channelNumber: Int) {
-        var chunnelName = chunnelName
-        chunnelName = chunnelName.trim { it <= ' ' }
-        if (channelKeyPair.name != chunnelName || channelKeyPair.number != channelNumber) {
-            if (chunnelName != "") {
-                channelKeyPair = ChannelKeyPair(chunnelName, channelNumber)
+    fun setChunnelName(channelName: String, channelNumber: String) {
+        var name = channelName
+        name = name.trim { it <= ' ' }
+        if (channelKeyPair.name != name || channelKeyPair.number != channelNumber) {
+            if (name != "") {
+                channelKeyPair = ChannelKeyPair(name, channelNumber)
             }
         }
     }
 
     override fun onUpdate() {
         if (!worldObj.isRemote) {
-            if (channelKeyPair.number > 0) {
-                val channelData = getChannelData(channelKey)
+            if (channelKeyPair.number != "") {
+                val channelData = RTMDetectorChannelMaster.getChannelData(channelKey)
                 if (channelData != null) {
                     val train = collidedTrain
                     if (train != null) {

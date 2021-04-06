@@ -13,11 +13,11 @@ import kotlin.properties.Delegates
 class MessageTrainDetectorAdvance : IMessage, IMessageHandler<MessageTrainDetectorAdvance?, IMessage?> {
     var entityID: Int by Delegates.notNull()
     var channelName: String by Delegates.notNull()
-    var channelNumber: Int by Delegates.notNull()
+    var channelNumber: String by Delegates.notNull()
 
     constructor()
 
-    constructor(entityID: Int, channelName: String, channelNumber: Int) {
+    constructor(entityID: Int, channelName: String, channelNumber: String) {
         this.entityID = entityID
         this.channelName = channelName
         this.channelNumber = channelNumber
@@ -26,13 +26,13 @@ class MessageTrainDetectorAdvance : IMessage, IMessageHandler<MessageTrainDetect
     override fun fromBytes(buf: ByteBuf) {
         entityID = buf.readInt()
         channelName = ByteBufUtils.readUTF8String(buf)
-        channelNumber = buf.readInt()
+        channelNumber = ByteBufUtils.readUTF8String(buf)
     }
 
     override fun toBytes(buf: ByteBuf) {
         buf.writeInt(entityID)
         ByteBufUtils.writeUTF8String(buf, channelName)
-        buf.writeInt(channelNumber)
+        ByteBufUtils.writeUTF8String(buf, channelNumber)
     }
 
     override fun onMessage(message: MessageTrainDetectorAdvance?, ctx: MessageContext?): IMessage? {
