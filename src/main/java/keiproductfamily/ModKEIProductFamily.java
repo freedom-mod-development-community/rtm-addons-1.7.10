@@ -17,6 +17,7 @@ import keiproductfamily.PermissionList.PermissionCompanyList;
 import keiproductfamily.network.PacketHandler;
 import keiproductfamily.rtmAddons.receiverBlock.receiverTrafficLights.ReceiverTrafficLightBlock;
 import keiproductfamily.rtmAddons.receiverBlock.receiverTrafficLights.ReceiverTrafficLightTile;
+import keiproductfamily.rtmAddons.receiverBlock.receiverTurnout.ReceiverTurnoutTile;
 import keiproductfamily.rtmAddons.scWirelessAdvance.BlockSCWirelessAdvance;
 import keiproductfamily.rtmAddons.scWirelessAdvance.TileEntitySC_WirelessAdvance;
 import keiproductfamily.rtmAddons.trainDetector.EntityTrainDetectorAdvance;
@@ -73,6 +74,8 @@ public class ModKEIProductFamily {
         GameRegistry.registerBlock(ModCommonVar.receiverTrafficLightBlock, "ReceiverTrafficLightBlock");
         GameRegistry.registerTileEntity(ReceiverTrafficLightTile.class, "ReceiverTrafficLightTile");
 
+        GameRegistry.registerBlock(ModCommonVar.receiverTurnoutBlock, "ReceiverTurnoutBlock");
+        GameRegistry.registerTileEntity(ReceiverTurnoutTile.class, "ReceiverTurnoutTile");
 
         ForgeChunkManager.setForcedChunkLoadingCallback(this, new ForgeChunkManager.LoadingCallback() {
             public void ticketsLoaded(List<ForgeChunkManager.Ticket> tickets, World world) {
@@ -144,5 +147,6 @@ public class ModKEIProductFamily {
     @Mod.EventHandler
     public void serverLoad(FMLServerStartingEvent event) {
         event.registerServerCommand(new CommandKEIPF());
+        event.registerServerCommand(new CommandHook());
     }
 }

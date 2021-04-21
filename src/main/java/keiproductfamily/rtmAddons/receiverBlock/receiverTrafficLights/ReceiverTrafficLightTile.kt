@@ -10,6 +10,7 @@ import keiproductfamily.rtmAddons.detectorChannel.RTMDetectorChannelMaster
 import keiproductfamily.rtmAddons.turnoutChannel.IRTMTurnoutReceiver
 import keiproductfamily.rtmAddons.turnoutChannel.RTMTurnoutChannelMaster
 import net.minecraft.nbt.NBTTagCompound
+import kotlin.properties.Delegates
 
 class ReceiverTrafficLightTile : TileNormal(), IRTMDetectorReceiver, IRTMTurnoutReceiver, IProvideElectricity {
     var detectorChannelKeys = Array(6) { ChannelKeyPair("", "") }
@@ -18,13 +19,14 @@ class ReceiverTrafficLightTile : TileNormal(), IRTMDetectorReceiver, IRTMTurnout
     var turnOutChannelKeyPair = ChannelKeyPair("", "")
     var forceSelectSignal = SignalLevel.STOP
 
-    var turnOutOperation = EnumTurnOutSyncSelection.OFF
+    var nowTurnOutSwitch: EnumTurnOutSwitch by Delegates.notNull()
     var isUpdate: Boolean = false
 
     fun setDetectorChunnelKeys(channelKeys: Array<ChannelKeyPair>) {
         if (this.detectorChannelKeys.size == channelKeys.size) {
             RTMDetectorChannelMaster.reSet(this, this.detectorChannelKeys, channelKeys)
             this.detectorChannelKeys = channelKeys
+            this.markDirtyAndNotify()
             this.markDirty()
             isUpdate = true
         }
@@ -33,6 +35,7 @@ class ReceiverTrafficLightTile : TileNormal(), IRTMDetectorReceiver, IRTMTurnout
     fun setTurnoutChunnelKey(channelKey: ChannelKeyPair) {
         RTMTurnoutChannelMaster.reSet(this, this.turnOutChannelKeyPair, channelKey)
         this.turnOutChannelKeyPair = channelKey
+        this.markDirtyAndNotify()
         this.markDirty()
         isUpdate = true
     }
@@ -45,6 +48,7 @@ class ReceiverTrafficLightTile : TileNormal(), IRTMDetectorReceiver, IRTMTurnout
         this.forcedSignalSlection = forcedSignalSlection
         this.turnOutSyncSelection = turnOutSyncSelection
         this.forceSelectSignal = forceSelectSignal
+        this.markDirtyAndNotify()
     }
 
     override fun validate() {
@@ -57,7 +61,7 @@ class ReceiverTrafficLightTile : TileNormal(), IRTMDetectorReceiver, IRTMTurnout
     override fun onNewDetectorSignal(channelKey: String, signalLevel: SignalLevel, rollSignID: Byte): Boolean {
         if (signalLevel == ModCommonVar.findTrainLevel) {
             for ((index, pair) in detectorChannelKeys.withIndex()) {
-                if (channelKey == pair.getKey()) {
+                if (channelKey == pair.keyString) {
                     _electricityAuto = index + 1
                     return true
                 }
@@ -66,12 +70,16 @@ class ReceiverTrafficLightTile : TileNormal(), IRTMDetectorReceiver, IRTMTurnout
         return false
     }
 
-    override fun onNewTurnoutSignal(channelKey: String, turnoutSide: EnumTurnOutSyncSelection): Boolean {
-        if (channelKey == turnOutChannelKeyPair.getKey()) {
-            turnOutOperation = turnoutSide
+    override fun onNewTurnoutNowSwitch(channelKey: String, nowSide: EnumTurnOutSwitch): Boolean {
+        if (channelKey == turnOutChannelKeyPair.keyString) {
+            nowTurnOutSwitch = nowSide
             return true
         }
         return false
+    }
+
+    override fun onNewTurnoutForceSelect(channelKey: String, turnoutSelect: EnumTurnOutSyncSelection): Boolean {
+        TODO("Not yet implemented")
     }
 
     override fun markDirtyAndNotify() {
@@ -97,7 +105,7 @@ class ReceiverTrafficLightTile : TileNormal(), IRTMDetectorReceiver, IRTMTurnout
         } else if (turnOutSyncSelection == EnumTurnOutSyncSelection.OFF) {
             _electricityAuto
         } else {
-            if (turnOutSyncSelection == turnOutOperation) {
+            if (turnOutSyncSelection == nowTurnOutSwitch) {
                 _electricityAuto
             } else {
                 SignalLevel.STOP.level

@@ -1,16 +1,19 @@
 package keiproductfamily.rtmAddons.turnoutChannel
 
+import keiproductfamily.rtmAddons.EnumTurnOutSwitch
 import keiproductfamily.rtmAddons.EnumTurnOutSyncSelection
 import net.minecraft.tileentity.TileEntity
 import java.util.HashSet
+import kotlin.properties.Delegates
 
 class RTMTurnoutChannelData(val channelKey: String) {
-    var turnoutSide = EnumTurnOutSyncSelection.OFF
+    var turnoutNowSide : EnumTurnOutSwitch? = null
+    var turnoutForce : EnumTurnOutSyncSelection? = null
     var irtmaReceivers = HashSet<IRTMTurnoutReceiver>()
 
-    fun setTurnoutData(turnoutSide: EnumTurnOutSyncSelection) {
-        if (this.turnoutSide != turnoutSide) {
-            this.turnoutSide = turnoutSide
+    fun setTurnOutNowSwitchData(turnoutSide: EnumTurnOutSwitch) {
+        if (this.turnoutNowSide== null || this.turnoutNowSide != turnoutSide) {
+            this.turnoutNowSide = turnoutSide
             val removes = HashSet<IRTMTurnoutReceiver>()
             for (receiver in irtmaReceivers) {
                 if (receiver is TileEntity) {
@@ -18,11 +21,29 @@ class RTMTurnoutChannelData(val channelKey: String) {
                         removes.add(receiver)
                     }
                 }
-                receiver.onNewTurnoutSignal(channelKey, turnoutSide)
+                receiver.onNewTurnoutNowSwitch(channelKey, turnoutSide)
                 receiver.markDirtyAndNotify()
             }
             irtmaReceivers.removeAll(removes)
-            RTMTurnoutChannelMaster.putCallList(channelKey, turnoutSide)
+            RTMTurnoutChannelMaster.putNowSelectCallList(channelKey, turnoutSide)
+        }
+    }
+
+    fun setTurnOutForceData(turnoutForce: EnumTurnOutSyncSelection) {
+        if (this.turnoutForce != turnoutForce) {
+            this.turnoutForce = turnoutForce
+            val removes = HashSet<IRTMTurnoutReceiver>()
+            for (receiver in irtmaReceivers) {
+                if (receiver is TileEntity) {
+                    if ((receiver as TileEntity).isInvalid) {
+                        removes.add(receiver)
+                    }
+                }
+                receiver.onNewTurnoutForceSelect(channelKey, turnoutForce)
+                receiver.markDirtyAndNotify()
+            }
+            irtmaReceivers.removeAll(removes)
+            RTMTurnoutChannelMaster.putForceSelectCallList(channelKey, turnoutForce)
         }
     }
 }

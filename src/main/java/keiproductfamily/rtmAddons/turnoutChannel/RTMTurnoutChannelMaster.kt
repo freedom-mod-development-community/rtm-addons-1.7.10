@@ -1,7 +1,10 @@
 package keiproductfamily.rtmAddons.turnoutChannel
 
 import keiproductfamily.rtmAddons.ChannelKeyPair
+import keiproductfamily.rtmAddons.EnumTurnOutSwitch
 import keiproductfamily.rtmAddons.EnumTurnOutSyncSelection
+import keiproductfamily.rtmAddons.detectorChannel.RTMDetectorChannelData
+import keiproductfamily.rtmAddons.detectorChannel.RTMDetectorChannelMaster
 import java.util.HashMap
 import java.util.LinkedHashMap
 
@@ -12,8 +15,8 @@ object RTMTurnoutChannelMaster {
     }
 
     fun reSet(reveiver: IRTMTurnoutReceiver, from: ChannelKeyPair, to: ChannelKeyPair) {
-        val fromSet = setOf(from.getKey())
-        val toSet = setOf(to.getKey())
+        val fromSet = setOf(from.keyString)
+        val toSet = setOf(to.keyString)
         val remove = HashSet(fromSet)
         remove.removeAll(toSet)
         val add = HashSet(toSet)
@@ -32,16 +35,24 @@ object RTMTurnoutChannelMaster {
     }
 
 
-    private val calledList = LinkedHashMap<String, EnumTurnOutSyncSelection>()
+    private val forceSelectCalledList = LinkedHashMap<String, EnumTurnOutSyncSelection>()
+    private val nowSwitchCalledList = LinkedHashMap<String, EnumTurnOutSwitch>()
 
-    fun putCallList(channelKey: String, turnoutSide: EnumTurnOutSyncSelection){
-        calledList.remove(channelKey)
-        calledList[channelKey] = turnoutSide
+    fun putForceSelectCallList(channelKey: String, forceSelect: EnumTurnOutSyncSelection){
+        forceSelectCalledList.remove(channelKey)
+        forceSelectCalledList[channelKey] = forceSelect
+    }
+    fun putNowSelectCallList(channelKey: String, turnoutSide: EnumTurnOutSwitch){
+        nowSwitchCalledList.remove(channelKey)
+        nowSwitchCalledList[channelKey] = turnoutSide
     }
 
     fun reCallList(receiver: IRTMTurnoutReceiver) {
-        for ((key, value) in calledList) {
-            receiver.onNewTurnoutSignal(key, value)
+        for ((key, value) in forceSelectCalledList) {
+            receiver.onNewTurnoutForceSelect(key, value)
+        }
+        for ((key, value) in nowSwitchCalledList) {
+            receiver.onNewTurnoutNowSwitch(key, value)
         }
     }
 }

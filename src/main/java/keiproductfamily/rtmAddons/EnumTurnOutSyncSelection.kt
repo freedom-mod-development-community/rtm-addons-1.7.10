@@ -1,6 +1,6 @@
 package keiproductfamily.rtmAddons
 
-enum class EnumTurnOutSyncSelection(val id: Int) {
+enum class EnumTurnOutSyncSelection(val id: Int)  {
     OFF(0), Left(1), Right(2);
 
     companion object {
@@ -12,5 +12,9 @@ enum class EnumTurnOutSyncSelection(val id: Int) {
             }
             return OFF
         }
+    }
+
+    fun toEnumTurnOutSwitch(): EnumTurnOutSwitch{
+        return EnumTurnOutSwitch.getType(id)
     }
 }

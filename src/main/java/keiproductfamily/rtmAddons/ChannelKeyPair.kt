@@ -8,7 +8,7 @@ data class ChannelKeyPair(
     val name: String = "",
     val number: String = ""
 ) {
-    fun getKey(): String = toString()
+    val keyString: String by lazy { toString() }
     override fun toString(): String = "$name-$number"
 
     fun writeToByteBuf(buf: ByteBuf): ByteBuf {

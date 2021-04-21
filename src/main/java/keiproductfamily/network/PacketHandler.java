@@ -7,6 +7,7 @@ import cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import cpw.mods.fml.relauncher.Side;
 import keiproductfamily.rtmAddons.RequestEntityNBTData;
 import keiproductfamily.rtmAddons.receiverBlock.receiverTrafficLights.ReceiverTrafficLightMessage;
+import keiproductfamily.rtmAddons.receiverBlock.receiverTurnout.ReceiverTurnoutMessage;
 import keiproductfamily.rtmAddons.trainDetector.MessageTrainDetectorAdvance;
 
 public class PacketHandler {
@@ -23,6 +24,8 @@ public class PacketHandler {
         registerMessage(new ReceiverTrafficLightMessage(), ReceiverTrafficLightMessage.class, 0x03, Side.SERVER);
         registerMessage(new ReceiverTrafficLightMessage(), ReceiverTrafficLightMessage.class, 0x03, Side.CLIENT);
         registerMessage(new RequestEntityNBTData(), RequestEntityNBTData.class, 0x04, Side.SERVER);
+        registerMessage(new ReceiverTurnoutMessage(), ReceiverTurnoutMessage.class, 0x05, Side.SERVER);
+        registerMessage(new ReceiverTurnoutMessage(), ReceiverTurnoutMessage.class, 0x05, Side.CLIENT);
     }
 
     public static <REQ extends IMessage, REPLY extends IMessage> void registerMessage(IMessageHandler<? super REQ, ? extends REPLY> messageHandler, Class<REQ> requestMessageType, int discriminator, Side sendTo) {

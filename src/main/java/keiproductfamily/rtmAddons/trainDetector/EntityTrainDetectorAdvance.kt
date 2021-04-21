@@ -41,14 +41,15 @@ class EntityTrainDetectorAdvance(world: World?) : EntityElectricalWiring(world) 
     }
 
     val channelKey: String
-        get() = channelKeyPair.getKey()
+        get() = channelKeyPair.keyString
 
     fun setChunnelName(channelName: String, channelNumber: String) {
-        var name = channelName
-        name = name.trim { it <= ' ' }
-        if (channelKeyPair.name != name || channelKeyPair.number != channelNumber) {
-            if (name != "") {
-                channelKeyPair = ChannelKeyPair(name, channelNumber)
+        val name = channelName.trim { it <= ' ' }
+        val number = channelNumber.trim { it <= ' ' }
+        if (channelKeyPair.name != name || channelKeyPair.number != number) {
+            if (name != "" && number != "") {
+                channelKeyPair = ChannelKeyPair(name, number)
+                RTMDetectorChannelMaster.makeChannel(channelKeyPair)
             }
         }
     }

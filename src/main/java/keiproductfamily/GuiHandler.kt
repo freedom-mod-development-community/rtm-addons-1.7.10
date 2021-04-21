@@ -3,6 +3,8 @@ package keiproductfamily
 import cpw.mods.fml.common.network.IGuiHandler
 import keiproductfamily.rtmAddons.receiverBlock.receiverTrafficLights.ReceiverTrafficLightGui
 import keiproductfamily.rtmAddons.receiverBlock.receiverTrafficLights.ReceiverTrafficLightTile
+import keiproductfamily.rtmAddons.receiverBlock.receiverTurnout.ReceiverTurnoutGui
+import keiproductfamily.rtmAddons.receiverBlock.receiverTurnout.ReceiverTurnoutTile
 import keiproductfamily.rtmAddons.trainDetector.EntityTrainDetectorAdvance
 import keiproductfamily.rtmAddons.trainDetector.GuiTrainDetectorAdvance
 import net.minecraft.entity.player.EntityPlayer
@@ -23,6 +25,12 @@ class GuiHandler : IGuiHandler {
                     return ContainerKEI()
                 }
             }
+            GuiIDs.GuiID_ReceiverTurnoutSetting -> {
+                val tile = world.getTileEntity(x, y, z)
+                if (tile is ReceiverTurnoutTile) {
+                    return ContainerKEI()
+                }
+            }
         }
         return null
     }
@@ -39,6 +47,12 @@ class GuiHandler : IGuiHandler {
                 val tile = world.getTileEntity(x, y, z)
                 if (tile is ReceiverTrafficLightTile) {
                     return ReceiverTrafficLightGui(tile)
+                }
+            }
+            GuiIDs.GuiID_ReceiverTurnoutSetting -> {
+                val tile = world.getTileEntity(x, y, z)
+                if (tile is ReceiverTurnoutTile) {
+                    return ReceiverTurnoutGui(tile)
                 }
             }
         }
