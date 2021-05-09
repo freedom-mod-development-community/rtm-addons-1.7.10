@@ -154,6 +154,10 @@ class ReceiverTurnoutTile : TileNormal(), IRTMDetectorReceiver, IRTMTurnoutRecei
         }
     }
 
+    fun changeNotify(){
+        this.worldObj.notifyBlockOfNeighborChange(xCoord, yCoord, zCoord, this.blockType)
+    }
+
 
     private var _electricityAuto: Int = 0
     override fun getElectricity(): Int {
@@ -227,7 +231,7 @@ class ReceiverTurnoutTile : TileNormal(), IRTMDetectorReceiver, IRTMTurnoutRecei
             }
         }
         if(ret != rsPowerBuff){
-            this.worldObj.notifyBlockOfNeighborChange(xCoord, yCoord, zCoord, this.blockType)
+            changeNotify()
             rsPowerBuff = ret
         }
         return ret

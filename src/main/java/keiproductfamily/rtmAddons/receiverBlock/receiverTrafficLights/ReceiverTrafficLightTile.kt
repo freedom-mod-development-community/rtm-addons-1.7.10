@@ -10,7 +10,6 @@ import keiproductfamily.rtmAddons.detectorChannel.RTMDetectorChannelMaster
 import keiproductfamily.rtmAddons.turnoutChannel.IRTMTurnoutReceiver
 import keiproductfamily.rtmAddons.turnoutChannel.RTMTurnoutChannelMaster
 import net.minecraft.nbt.NBTTagCompound
-import kotlin.properties.Delegates
 
 class ReceiverTrafficLightTile : TileNormal(), IRTMDetectorReceiver, IRTMTurnoutReceiver, IProvideElectricity {
     var detectorChannelKeys = Array(6) { ChannelKeyPair("", "") }
@@ -19,7 +18,7 @@ class ReceiverTrafficLightTile : TileNormal(), IRTMDetectorReceiver, IRTMTurnout
     var turnOutChannelKeyPair = ChannelKeyPair("", "")
     var forceSelectSignal = SignalLevel.STOP
 
-    var nowTurnOutSwitch: EnumTurnOutSwitch by Delegates.notNull()
+    var nowTurnOutSwitch = EnumTurnOutSyncSelection.OFF
     var isUpdate: Boolean = false
 
     fun setDetectorChunnelKeys(channelKeys: Array<ChannelKeyPair>) {
@@ -72,7 +71,11 @@ class ReceiverTrafficLightTile : TileNormal(), IRTMDetectorReceiver, IRTMTurnout
 
     override fun onNewTurnoutNowSwitch(channelKey: String, nowSide: EnumTurnOutSwitch): Boolean {
         if (channelKey == turnOutChannelKeyPair.keyString) {
-            nowTurnOutSwitch = nowSide
+            val newValue = nowSide.toEnumTurnOutSyncSelection()
+            if(nowTurnOutSwitch != newValue) {
+                nowTurnOutSwitch = newValue
+                changeNotify()
+            }
             return true
         }
         return false
@@ -97,6 +100,10 @@ class ReceiverTrafficLightTile : TileNormal(), IRTMDetectorReceiver, IRTMTurnout
         }
     }
 
+    fun changeNotify(){
+        this.worldObj.notifyBlockOfNeighborChange(xCoord, yCoord, zCoord, this.blockType)
+    }
+
 
     private var _electricityAuto: Int = 0
     override fun getElectricity(): Int {
@@ -105,7 +112,7 @@ class ReceiverTrafficLightTile : TileNormal(), IRTMDetectorReceiver, IRTMTurnout
         } else if (turnOutSyncSelection == EnumTurnOutSyncSelection.OFF) {
             _electricityAuto
         } else {
-            if (turnOutSyncSelection == nowTurnOutSwitch) {
+            if (nowTurnOutSwitch == EnumTurnOutSyncSelection.OFF || turnOutSyncSelection == nowTurnOutSwitch) {
                 _electricityAuto
             } else {
                 SignalLevel.STOP.level
