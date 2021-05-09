@@ -166,6 +166,7 @@ class ReceiverTurnoutTile : TileNormal(), IRTMDetectorReceiver, IRTMTurnoutRecei
         val i = 0
     }
 
+    var rsPowerBuff = 0
     fun getRSPower(outDirection: Int): Int {
         var retTurnout = false
         var retDetector = false
@@ -208,8 +209,10 @@ class ReceiverTurnoutTile : TileNormal(), IRTMDetectorReceiver, IRTMTurnoutRecei
             }
         }
 
+        var ret = 0
+
         if (retTurnout) {
-            return if (getTurnOutSelection() != defaultTurnOutSelection) {
+            ret = if (getTurnOutSelection() != defaultTurnOutSelection) {
                 15
             } else {
                 0
@@ -217,13 +220,17 @@ class ReceiverTurnoutTile : TileNormal(), IRTMDetectorReceiver, IRTMTurnoutRecei
         }
 
         if (retDetector) {
-            return if (isFindTrain) {
+            ret = if (isFindTrain) {
                 15
             } else {
                 0
             }
         }
-        return 0
+        if(ret != rsPowerBuff){
+            this.worldObj.notifyBlockOfNeighborChange(xCoord, yCoord, zCoord, this.blockType)
+            rsPowerBuff = ret
+        }
+        return ret
     }
 
 
