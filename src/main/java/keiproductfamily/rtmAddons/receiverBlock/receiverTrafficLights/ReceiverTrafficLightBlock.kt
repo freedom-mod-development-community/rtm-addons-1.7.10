@@ -12,7 +12,7 @@ import net.minecraft.world.World
 class ReceiverTrafficLightBlock() : BlockContainer(Material.rock) , IBlockConnective {
     init {
         setBlockName("ReceiverTrafficLight")
-        setBlockTextureName(ModKEIProductFamily.DOMAIN + ":ReceiverTrafficLight")
+        setBlockTextureName(ModKEIProductFamily.DOMAIN + ":receivertrafficlight")
         setCreativeTab(ModKEIProductFamily.keipfCreativeTabs)
     }
 

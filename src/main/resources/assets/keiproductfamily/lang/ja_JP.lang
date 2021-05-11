@@ -5,7 +5,7 @@ tile.TAWReceiveBlock.name=列車接近警報受信機ブロック
 item.TAWSendItem.name=列車接近送信機アイテム
 item.TPRReceiveItem.name=列車防護無線受信機アイテム
 item.TPRSendItem.name=列車防護無線送信機アイテム
-tile.TPRSendBlock.name=列車防護無線送信機ブロック
+tile.TPRSendBlock.name=列車防護無線送信機ブロック　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　
 tile.ReceiverTrafficLight.name=信号機用受信ブロック
 tile.ReceiverTurnout.name=分岐機用受信ブロック
 
