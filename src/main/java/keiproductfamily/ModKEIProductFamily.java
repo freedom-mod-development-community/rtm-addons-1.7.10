@@ -22,6 +22,7 @@ import keiproductfamily.rtmAddons.scWirelessAdvance.BlockSCWirelessAdvance;
 import keiproductfamily.rtmAddons.scWirelessAdvance.TileEntitySC_WirelessAdvance;
 import keiproductfamily.rtmAddons.trainDetector.EntityTrainDetectorAdvance;
 import keiproductfamily.rtmAddons.trainDetector.ItemTrainDetectorAdvance;
+import keiproductfamily.rtmAddons.turnoutSelecter.TurnoutSelecterTile;
 import net.minecraft.block.Block;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
@@ -77,6 +78,9 @@ public class ModKEIProductFamily {
         GameRegistry.registerBlock(ModCommonVar.receiverTurnoutBlock, "ReceiverTurnoutBlock");
         GameRegistry.registerTileEntity(ReceiverTurnoutTile.class, "ReceiverTurnoutTile");
 
+        GameRegistry.registerBlock(ModCommonVar.turnoutSelecterBlock, "TurnoutSelecterBlock");
+        GameRegistry.registerTileEntity(TurnoutSelecterTile.class, "TurnoutSelecterTile");
+
         ForgeChunkManager.setForcedChunkLoadingCallback(this, new ForgeChunkManager.LoadingCallback() {
             public void ticketsLoaded(List<ForgeChunkManager.Ticket> tickets, World world) {
                 for (ForgeChunkManager.Ticket ticket : tickets) {
@@ -103,6 +107,7 @@ public class ModKEIProductFamily {
     public void init(FMLInitializationEvent event) {
         EntityRegistry.registerModEntity(EntityTrainDetectorAdvance.class, "EntityTrainDetectorAdvance", 301, ModKEIProductFamily.instance, 1024, 3, false);
         NetworkRegistry.INSTANCE.registerGuiHandler(instance, new GuiHandler());
+        proxy.Init();
     }
 
     @SubscribeEvent

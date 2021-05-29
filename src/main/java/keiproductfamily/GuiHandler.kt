@@ -7,6 +7,8 @@ import keiproductfamily.rtmAddons.receiverBlock.receiverTurnout.ReceiverTurnoutG
 import keiproductfamily.rtmAddons.receiverBlock.receiverTurnout.ReceiverTurnoutTile
 import keiproductfamily.rtmAddons.trainDetector.EntityTrainDetectorAdvance
 import keiproductfamily.rtmAddons.trainDetector.GuiTrainDetectorAdvance
+import keiproductfamily.rtmAddons.turnoutSelecter.TurnoutSelecterGui
+import keiproductfamily.rtmAddons.turnoutSelecter.TurnoutSelecterTile
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.world.World
 
@@ -28,6 +30,12 @@ class GuiHandler : IGuiHandler {
             GuiIDs.GuiID_ReceiverTurnoutSetting -> {
                 val tile = world.getTileEntity(x, y, z)
                 if (tile is ReceiverTurnoutTile) {
+                    return ContainerKEI()
+                }
+            }
+            GuiIDs.GuiID_TurnoutSelecterGui -> {
+                val tile = world.getTileEntity(x, y, z)
+                if(tile is TurnoutSelecterTile) {
                     return ContainerKEI()
                 }
             }
@@ -53,6 +61,12 @@ class GuiHandler : IGuiHandler {
                 val tile = world.getTileEntity(x, y, z)
                 if (tile is ReceiverTurnoutTile) {
                     return ReceiverTurnoutGui(tile)
+                }
+            }
+            GuiIDs.GuiID_TurnoutSelecterGui -> {
+                val tile = world.getTileEntity(x, y, z)
+                if(tile is TurnoutSelecterTile) {
+                    return TurnoutSelecterGui(tile)
                 }
             }
         }

@@ -8,6 +8,7 @@ item.TPRSendItem.name=Train Protection Radio Sender Item
 tile.TPRSendBlock.name=Train Protection Radio Sender Block
 tile.ReceiverTrafficLight.name=Receiver Block for Traffic Light
 tile.ReceiverTurnout.name=Receiver Block for Turnout
+tile.TurnoutSelecter.name=Turnout Selecter
 
 Kuma Electric Industry Product Family=Kuma Electric Industry Product Family
 

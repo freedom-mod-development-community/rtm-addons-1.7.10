@@ -14,6 +14,10 @@ enum class EnumTurnOutSyncSelection(val id: Int)  {
         }
     }
 
+    fun getNext(): EnumTurnOutSyncSelection {
+        return getType((id+1) % values().size)
+    }
+
     fun toEnumTurnOutSwitch(): EnumTurnOutSwitch{
         return EnumTurnOutSwitch.getType(id)
     }
