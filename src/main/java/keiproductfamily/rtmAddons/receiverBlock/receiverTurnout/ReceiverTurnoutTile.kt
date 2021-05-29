@@ -164,11 +164,7 @@ class ReceiverTurnoutTile : TileNormal(), IRTMDetectorReceiver, IRTMTurnoutRecei
         return SignalLevel.STOP.level
     }
 
-    override fun setElectricity(x: Int, y: Int, z: Int, level: Int) {
-        //TODO 用いるか判断
-        //_electricity = level
-        val i = 0
-    }
+    override fun setElectricity(x: Int, y: Int, z: Int, level: Int) {}
 
     var rsPowerBuff = 0
     fun getRSPower(outDirection: Int): Int {

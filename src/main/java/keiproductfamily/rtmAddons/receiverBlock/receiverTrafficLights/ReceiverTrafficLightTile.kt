@@ -82,7 +82,7 @@ class ReceiverTrafficLightTile : TileNormal(), IRTMDetectorReceiver, IRTMTurnout
     }
 
     override fun onNewTurnoutForceSelect(channelKey: String, turnoutSelect: EnumTurnOutSyncSelection): Boolean {
-        TODO("Not yet implemented")
+        return false
     }
 
     override fun markDirtyAndNotify() {
@@ -120,11 +120,7 @@ class ReceiverTrafficLightTile : TileNormal(), IRTMDetectorReceiver, IRTMTurnout
         }
     }
 
-    override fun setElectricity(x: Int, y: Int, z: Int, level: Int) {
-        //TODO 用いるか判断
-        //_electricity = level
-        val i = 0
-    }
+    override fun setElectricity(x: Int, y: Int, z: Int, level: Int) {}
 
     override fun readFromNBT(nbt: NBTTagCompound) {
         super.readFromNBT(nbt)
