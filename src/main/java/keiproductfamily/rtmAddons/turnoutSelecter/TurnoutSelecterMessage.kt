@@ -7,7 +7,7 @@ import cpw.mods.fml.relauncher.Side
 import io.netty.buffer.ByteBuf
 import keiproductfamily.network.PacketHandler
 import keiproductfamily.rtmAddons.ChannelKeyPair
-import redstoneChunkLoader.network.TileEntityMessage
+import keiproductfamily.network.TileEntityMessage
 import kotlin.properties.Delegates
 
 class TurnoutSelecterMessage : TileEntityMessage, IMessageHandler<TurnoutSelecterMessage?, IMessage?> {

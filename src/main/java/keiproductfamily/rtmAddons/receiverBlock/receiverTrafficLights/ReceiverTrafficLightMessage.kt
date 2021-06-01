@@ -10,7 +10,7 @@ import keiproductfamily.network.PacketHandler
 import keiproductfamily.rtmAddons.ChannelKeyPair
 import keiproductfamily.rtmAddons.EnumForcedSignalMode
 import keiproductfamily.rtmAddons.EnumTurnOutSyncSelection
-import redstoneChunkLoader.network.TileEntityMessage
+import keiproductfamily.network.TileEntityMessage
 import kotlin.properties.Delegates
 
 class ReceiverTrafficLightMessage : TileEntityMessage, IMessageHandler<ReceiverTrafficLightMessage?, IMessage?> {
