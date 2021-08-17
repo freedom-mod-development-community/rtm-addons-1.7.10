@@ -3,7 +3,6 @@ package keiproductfamily.rtmAddons.receiverBlock.receiverTurnout
 import jp.kaiz.kaizpatch.util.KeyboardUtil
 import jp.ngt.ngtlib.gui.GuiScreenCustom
 import jp.ngt.ngtlib.math.NGTMath
-import jp.ngt.ngtlib.util.KeyboardUtil
 import keiproductfamily.Util
 import keiproductfamily.network.PacketHandler
 import keiproductfamily.rtmAddons.*

@@ -1,8 +1,8 @@
 package keiproductfamily.rtmAddons.receiverBlock.receiverTrafficLights
 
+import jp.kaiz.kaizpatch.util.KeyboardUtil
 import jp.ngt.ngtlib.gui.GuiScreenCustom
 import jp.ngt.ngtlib.math.NGTMath
-import jp.ngt.ngtlib.util.KeyboardUtil
 import jp.ngt.rtm.electric.SignalLevel
 import keiproductfamily.network.PacketHandler
 import keiproductfamily.rtmAddons.*

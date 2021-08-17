@@ -1,20 +1,20 @@
-package keiproductfamily.rtmAddons.turnoutSelecter
+package keiproductfamily.rtmAddons.turnoutSelector
 
 import jp.kaiz.kaizpatch.util.KeyboardUtil
 import jp.ngt.ngtlib.gui.GuiScreenCustom
 import jp.ngt.ngtlib.math.NGTMath
 import keiproductfamily.Util
 import keiproductfamily.network.PacketHandler
-import keiproductfamily.rtmAddons.*
+import keiproductfamily.rtmAddons.ChannelKeyPair
+import keiproductfamily.rtmAddons.GuiTextFieldWithID
 import net.minecraft.client.gui.GuiButton
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.gui.GuiTextField
 import net.minecraft.client.resources.I18n
 import org.lwjgl.input.Keyboard
-import java.lang.IllegalArgumentException
 import kotlin.properties.Delegates
 
-class TurnoutSelecterGui(private val tile: TurnoutSelecterTile) : GuiScreenCustom() {
+class TurnoutSelectorGui(private val tile: TurnoutSelectorTile) : GuiScreenCustom() {
     var turnoutChannelKeyPair: ChannelKeyPair by Delegates.notNull()
 
     private var thisTurnOutChannelKeyTFs: Array<GuiTextFieldWithID> by Delegates.notNull()
@@ -62,7 +62,7 @@ class TurnoutSelecterGui(private val tile: TurnoutSelecterTile) : GuiScreenCusto
         )
 
         PacketHandler.sendPacketServer(
-            TurnoutSelecterMessage(
+            TurnoutSelectorMessage(
                 tile,
                 this.turnoutChannelKeyPair
             )
@@ -85,7 +85,7 @@ class TurnoutSelecterGui(private val tile: TurnoutSelecterTile) : GuiScreenCusto
     }
 
     override fun keyTyped(par1: Char, par2: Int) {
-        if (par2 == 1 || par2 == mc.gameSettings.keyBindInventory.keyCode) {
+        if (par2 == 1) {
             mc.thePlayer.closeScreen()
         } else if (currentTextField is GuiTextFieldWithID) {
             val id = (currentTextField as GuiTextFieldWithID).id
@@ -115,6 +115,8 @@ class TurnoutSelecterGui(private val tile: TurnoutSelecterTile) : GuiScreenCusto
             }
         } else if (par2 == 28) {
             formatSignalLevel()
+        } else if (par2 == mc.gameSettings.keyBindInventory.keyCode) {
+            mc.thePlayer.closeScreen()
         }
     }
 
@@ -130,7 +132,7 @@ class TurnoutSelecterGui(private val tile: TurnoutSelecterTile) : GuiScreenCusto
         drawCenteredString(fontRendererObj, "-", width / 2 - 70, 42, -1)
     }
 
-    companion object{
+    companion object {
         val ENABLED_COLLAR = Util.intCollar(255, 90, 90, 255)
         val OFF_COLLAR = Util.intCollar(110, 110, 110, 255)
     }
