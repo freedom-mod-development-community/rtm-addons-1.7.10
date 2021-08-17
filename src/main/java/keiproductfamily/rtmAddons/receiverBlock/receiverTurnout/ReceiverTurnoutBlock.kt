@@ -3,10 +3,9 @@ package keiproductfamily.rtmAddons.receiverBlock.receiverTurnout
 import cpw.mods.fml.relauncher.Side
 import cpw.mods.fml.relauncher.SideOnly
 import jp.ngt.rtm.electric.IBlockConnective
-import jp.ngt.rtm.electric.SignalConverterType
-import jp.ngt.rtm.electric.TileEntitySignalConverter
 import keiproductfamily.GuiIDs
 import keiproductfamily.ModKEIProductFamily
+import keiproductfamily.PermissionList.IParmission
 import keiproductfamily.getDirectional
 import net.minecraft.block.BlockContainer
 import net.minecraft.block.material.Material
@@ -16,12 +15,11 @@ import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.ItemStack
 import net.minecraft.tileentity.TileEntity
 import net.minecraft.util.IIcon
-import net.minecraft.util.MathHelper
 import net.minecraft.world.IBlockAccess
 import net.minecraft.world.World
 import kotlin.properties.Delegates
 
-class ReceiverTurnoutBlock : BlockContainer(Material.rock) , IBlockConnective {
+class ReceiverTurnoutBlock : BlockContainer(Material.rock) , IBlockConnective, IParmission {
     init {
         setBlockName("ReceiverTurnout")
         setBlockTextureName(ModKEIProductFamily.DOMAIN + ":receiverturnout")
@@ -85,5 +83,9 @@ class ReceiverTurnoutBlock : BlockContainer(Material.rock) , IBlockConnective {
             return blockIconFront
         }
         return blockIcon
+    }
+
+    override fun getName(): String {
+        return "ReceiverTurnout"
     }
 }

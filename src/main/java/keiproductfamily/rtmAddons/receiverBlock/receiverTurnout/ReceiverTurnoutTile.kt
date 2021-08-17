@@ -2,7 +2,8 @@ package keiproductfamily.rtmAddons.receiverBlock.receiverTurnout
 
 import jp.ngt.rtm.electric.IProvideElectricity
 import jp.ngt.rtm.electric.SignalLevel
-import keiproductfamily.*
+import keiproductfamily.ModCommonVar
+import keiproductfamily.getChannelKeyPair
 import keiproductfamily.normal.TileNormal
 import keiproductfamily.rtmAddons.ChannelKeyPair
 import keiproductfamily.rtmAddons.EnumTurnOutSwitch
@@ -11,8 +12,8 @@ import keiproductfamily.rtmAddons.detectorChannel.IRTMDetectorReceiver
 import keiproductfamily.rtmAddons.detectorChannel.RTMDetectorChannelMaster
 import keiproductfamily.rtmAddons.turnoutChannel.IRTMTurnoutReceiver
 import keiproductfamily.rtmAddons.turnoutChannel.RTMTurnoutChannelMaster
+import keiproductfamily.setChannelKeyPair
 import net.minecraft.nbt.NBTTagCompound
-import java.lang.IllegalArgumentException
 import java.util.*
 
 class ReceiverTurnoutTile : TileNormal(), IRTMDetectorReceiver, IRTMTurnoutReceiver, IProvideElectricity {
@@ -20,6 +21,16 @@ class ReceiverTurnoutTile : TileNormal(), IRTMDetectorReceiver, IRTMTurnoutRecei
      * 自身の名称
      */
     var thisTurnOutChannelKeyPair = ChannelKeyPair("", "")
+        set(channelKey: ChannelKeyPair) {
+            RTMTurnoutChannelMaster.reSet(this, this.thisTurnOutChannelKeyPair, channelKey)
+            RTMTurnoutChannelMaster.getChannelData(channelKey.keyString)
+                ?.setTurnOutNowSwitchData(this.getTurnOutSelection())
+            if (this.thisTurnOutChannelKeyPair != channelKey) {
+                field = channelKey
+                this.markDirtyAndNotify()
+                isUpdate = true
+            }
+        }
 
     /**
      * 左側を指定する方向幕のID
@@ -30,6 +41,14 @@ class ReceiverTurnoutTile : TileNormal(), IRTMDetectorReceiver, IRTMTurnoutRecei
      * 方向幕などの情報を参照する検知器の名称
      */
     var detectorChannelKey = ChannelKeyPair("", "")
+        set(channelKey: ChannelKeyPair) {
+            RTMDetectorChannelMaster.reSet(this, this.detectorChannelKey, channelKey)
+            if (detectorChannelKey != channelKey) {
+                field = channelKey
+                this.markDirtyAndNotify()
+                isUpdate = true
+            }
+        }
 
     /**
      * デフォルト（RS出力なし）での分岐の方向
@@ -52,6 +71,15 @@ class ReceiverTurnoutTile : TileNormal(), IRTMDetectorReceiver, IRTMTurnoutRecei
     var turnOutOperation = EnumTurnOutSyncSelection.OFF
 
     /**
+     * 方向幕による制御を維持する時間
+     * 0 のとき、次の列車が来るまで維持
+     * 1～ 列車を検知してから方向幕による制御を維持する時間 単位:秒
+     */
+    var keepTurnOutSelectTime = 0
+
+    var receiveCnt = 0
+
+    /**
      * 様々な処理の最終的な結果
      */
     fun getTurnOutSelection(): EnumTurnOutSwitch {
@@ -65,32 +93,17 @@ class ReceiverTurnoutTile : TileNormal(), IRTMDetectorReceiver, IRTMTurnoutRecei
 
     var isUpdate: Boolean = false
 
-    fun setDetectorChunnelKey(channelKey: ChannelKeyPair) {
-        RTMDetectorChannelMaster.reSet(this, this.detectorChannelKey, channelKey)
-        this.detectorChannelKey = channelKey
-        this.markDirtyAndNotify()
-        this.markDirty()
-        isUpdate = true
-    }
-
-    fun setThisTurnoutChunnelKey(channelKey: ChannelKeyPair) {
-        RTMTurnoutChannelMaster.reSet(this, this.thisTurnOutChannelKeyPair, channelKey)
-        RTMTurnoutChannelMaster.getChannelData(channelKey.keyString)
-            ?.setTurnOutNowSwitchData(this.getTurnOutSelection())
-        this.thisTurnOutChannelKeyPair = channelKey
-        this.markDirtyAndNotify()
-        this.markDirty()
-        isUpdate = true
-    }
-
     fun setDatas(
         defaultTurnOutSelection: EnumTurnOutSwitch,
-        turnOutLeftSelectRollIDs: BitSet
+        turnOutLeftSelectRollIDs: BitSet,
+        keepTurnOutSelectTime: Int
     ) {
         this.defaultTurnOutSelection = defaultTurnOutSelection
         this.turnOutLeftSelectRollIDs = turnOutLeftSelectRollIDs
+        this.keepTurnOutSelectTime = keepTurnOutSelectTime
         RTMDetectorChannelMaster.reCallList(this)
         this.markDirtyAndNotify()
+        isUpdate = true
     }
 
     override fun validate() {
@@ -108,16 +121,20 @@ class ReceiverTurnoutTile : TileNormal(), IRTMDetectorReceiver, IRTMTurnoutRecei
 
     override fun onNewDetectorSignal(channelKey: String, signalLevel: SignalLevel, rollSignID: Byte): Boolean {
         if (this.detectorChannelKey.keyString == channelKey) {
-            if (signalLevel == ModCommonVar.notfindTrainLevel || rollSignID < 0 || 15 < rollSignID) {
-                this.turnOutSyncSelection = this.defaultTurnOutSelection
+            //error or 時間経過で方向を自動復帰し、列車が見つかっていない経過時間が設定よりたっている
+            if (signalLevel == ModCommonVar.notfindTrainLevel || (rollSignID < 0 || 15 < rollSignID)) {
+                if (keepTurnOutSelectTime in 1..receiveCnt / 20) {
+                    this.turnOutSyncSelection = this.defaultTurnOutSelection
+                }
                 this.isFindTrain = false
-            } else {
+            } else if (signalLevel == ModCommonVar.findTrainLevel) {
                 if (turnOutLeftSelectRollIDs.get(rollSignID.toInt())) {
                     this.turnOutSyncSelection = EnumTurnOutSwitch.Left
                 } else {
                     this.turnOutSyncSelection = EnumTurnOutSwitch.Right
                 }
                 this.isFindTrain = true
+                receiveCnt = 0
             }
             syncNowSwitchData()
             return true
@@ -134,6 +151,7 @@ class ReceiverTurnoutTile : TileNormal(), IRTMDetectorReceiver, IRTMTurnoutRecei
         if (channelKey == thisTurnOutChannelKeyPair.keyString) {
             turnOutOperation = turnoutSelect
             syncNowSwitchData()
+            markDirtyAndNotify()
             return true
         }
         return false
@@ -154,7 +172,7 @@ class ReceiverTurnoutTile : TileNormal(), IRTMDetectorReceiver, IRTMTurnoutRecei
         }
     }
 
-    fun changeNotify(){
+    fun changeNotify() {
         this.worldObj.notifyBlockOfNeighborChange(xCoord, yCoord, zCoord, this.blockType)
     }
 
@@ -226,23 +244,34 @@ class ReceiverTurnoutTile : TileNormal(), IRTMDetectorReceiver, IRTMTurnoutRecei
                 0
             }
         }
-        if(ret != rsPowerBuff){
+        if (ret != rsPowerBuff) {
             changeNotify()
             rsPowerBuff = ret
         }
         return ret
     }
 
+    override fun updateEntity() {
+        super.updateEntity()
+        if (receiveCnt < keepTurnOutSelectTime * 20 + 20) {
+            receiveCnt++
+        }
+    }
+
+    override fun isRemote(): Boolean {
+        return worldObj?.isRemote ?: false
+    }
 
     override fun readFromNBT(nbt: NBTTagCompound) {
         super.readFromNBT(nbt)
-        this.setThisTurnoutChunnelKey(nbt.getChannelKeyPair("thisTurnOutChannelKeyPair"))
+        thisTurnOutChannelKeyPair = nbt.getChannelKeyPair("thisTurnOutChannelKeyPair")
         this.turnOutLeftSelectRollIDs = BitSet.valueOf(nbt.getByteArray("turnOutLeftSelectRollIDs"))
-        this.setDetectorChunnelKey(nbt.getChannelKeyPair("detectorChannelKey"))
+        detectorChannelKey = (nbt.getChannelKeyPair("detectorChannelKey"))
         this.turnOutSyncSelection = EnumTurnOutSwitch.getType(nbt.getInteger("turnOutSyncSelection"))
         this.defaultTurnOutSelection = EnumTurnOutSwitch.getType(nbt.getInteger("defaultTurnOutSelection"))
         this.turnOutOperation = EnumTurnOutSyncSelection.getType(nbt.getInteger("turnOutOperation"))
         this._electricityAuto = nbt.getInteger("electricity")
+        this.keepTurnOutSelectTime = nbt.getInteger("keepTurnOutSelectTime")
     }
 
     override fun writeToNBT(nbt: NBTTagCompound) {
@@ -254,5 +283,6 @@ class ReceiverTurnoutTile : TileNormal(), IRTMDetectorReceiver, IRTMTurnoutRecei
         nbt.setInteger("defaultTurnOutSelection", defaultTurnOutSelection.id)
         nbt.setInteger("turnOutOperation", turnOutOperation.id)
         nbt.setInteger("electricity", _electricityAuto)
+        nbt.setInteger("keepTurnOutSelectTime", keepTurnOutSelectTime)
     }
 }

@@ -21,6 +21,18 @@ data class ChannelKeyPair(
         return this.writeToByteBuf(Unpooled.buffer()).array()
     }
 
+    override fun equals(other: Any?): Boolean {
+        if(this === other){return true}
+        return if(other is ChannelKeyPair){
+            this.name == other.name && this.number == other.number
+        }else{
+            false
+        }
+    }
+
+    override fun hashCode(): Int{
+        return name.hashCode() + number.hashCode()
+    }
 
     companion object {
         fun readFromBuf(buf: ByteBuf): ChannelKeyPair {

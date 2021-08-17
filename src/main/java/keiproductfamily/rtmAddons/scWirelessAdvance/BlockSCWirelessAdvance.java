@@ -8,6 +8,7 @@ import jp.ngt.rtm.electric.IBlockConnective;
 import jp.ngt.rtm.electric.SignalConverterType;
 import jp.ngt.rtm.electric.TileEntitySignalConverter;
 import keiproductfamily.ModKEIProductFamily;
+import keiproductfamily.PermissionList.IParmission;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
@@ -24,7 +25,7 @@ import net.minecraft.world.World;
 import java.util.List;
 
 
-public class BlockSCWirelessAdvance extends BlockContainer implements IBlockConnective {
+public class BlockSCWirelessAdvance extends BlockContainer implements IBlockConnective, IParmission {
     @SideOnly(Side.CLIENT)
     private IIcon icon;
 
@@ -45,7 +46,7 @@ public class BlockSCWirelessAdvance extends BlockContainer implements IBlockConn
     }
 
     @Override
-    public void onBlockPlacedBy(World world, int x, int y, int z, EntityLivingBase entityliving, ItemStack itemstack) {
+    public void onBlockPlacedBy(World world, int x, int y, int z, EntityLivingBase entityLiving, ItemStack itemstack) {
         world.setBlock(x, y, z, this, SignalConverterType.Wireless.id, 3);
     }
 
@@ -97,5 +98,10 @@ public class BlockSCWirelessAdvance extends BlockContainer implements IBlockConn
     @Override
     public boolean canConnect(World world, int x, int y, int z) {
         return true;
+    }
+
+    @Override
+    public String getName() {
+        return "SCWirelessAdvance";
     }
 }

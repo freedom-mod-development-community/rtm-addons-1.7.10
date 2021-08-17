@@ -28,7 +28,7 @@ public class GuiTrainDetectorAdvance extends GuiScreenCustom {
         this.textFields.clear();
         this.signalValues = new GuiTextField[2];
         this.signalValues[0] = this.setTextField(this.width / 2 - 60 + i0, 100, 40, 20, entityTDAdvance.getChannelKeyPair().getName());
-        this.signalValues[1] = this.setTextField(this.width / 2 + 20 + i0, 100, 40, 20, String.valueOf(entityTDAdvance.getChannelKeyPair().getNumber()));
+        this.signalValues[1] = this.setTextField(this.width / 2 + 20 + i0, 100, 40, 20, entityTDAdvance.getChannelKeyPair().getNumber());
 
     }
 
@@ -54,7 +54,7 @@ public class GuiTrainDetectorAdvance extends GuiScreenCustom {
     }
 
     protected void keyTyped(char par1, int par2) {
-        if (par2 == 1 || par2 == this.mc.gameSettings.keyBindInventory.getKeyCode()) {
+        if (par2 == 1) {
             this.mc.thePlayer.closeScreen();
         }
 
@@ -78,6 +78,8 @@ public class GuiTrainDetectorAdvance extends GuiScreenCustom {
                     currentTextField.setText(currentTextField.getText().substring(0, 3));
                 }
             }
+        }else if(par2 == this.mc.gameSettings.keyBindInventory.getKeyCode()){
+            this.mc.thePlayer.closeScreen();
         }
 
         if (par2 == 28) {

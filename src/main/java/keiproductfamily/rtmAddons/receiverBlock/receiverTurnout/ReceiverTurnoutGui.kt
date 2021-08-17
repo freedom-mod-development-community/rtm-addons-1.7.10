@@ -1,5 +1,6 @@
 package keiproductfamily.rtmAddons.receiverBlock.receiverTurnout
 
+import jp.kaiz.kaizpatch.util.KeyboardUtil
 import jp.ngt.ngtlib.gui.GuiScreenCustom
 import jp.ngt.ngtlib.math.NGTMath
 import jp.ngt.ngtlib.util.KeyboardUtil
@@ -11,9 +12,7 @@ import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.gui.GuiTextField
 import net.minecraft.client.resources.I18n
 import org.lwjgl.input.Keyboard
-import java.lang.IllegalArgumentException
 import java.util.*
-import javax.tools.Tool
 import kotlin.properties.Delegates
 
 class ReceiverTurnoutGui(private val tile: ReceiverTurnoutTile) : GuiScreenCustom() {
@@ -21,6 +20,7 @@ class ReceiverTurnoutGui(private val tile: ReceiverTurnoutTile) : GuiScreenCusto
     var detectorChannelKey: ChannelKeyPair by Delegates.notNull()
     var defaultTurnOutSelection: EnumTurnOutSwitch by Delegates.notNull()
     var turnOutLeftSelectRollIDs: BitSet by Delegates.notNull()
+    var keepTurnOutSelectTime: Int by Delegates.notNull()
 
     var turnOutOperation: EnumTurnOutSyncSelection by Delegates.notNull()
     var turnOutSyncSelection: EnumTurnOutSwitch by Delegates.notNull()
@@ -29,6 +29,7 @@ class ReceiverTurnoutGui(private val tile: ReceiverTurnoutTile) : GuiScreenCusto
     private var detectorChannelKeyTFs: Array<GuiTextFieldWithID> by Delegates.notNull()
     private var defaultTurnOutSelectButtons: Array<EnumGuiButton<EnumTurnOutSwitch>> by Delegates.notNull()
     private var turnOutSelectRollIDButtons: EnumMap<EnumTurnOutSwitch, Array<GuiButton>> by Delegates.notNull()
+    private var keepTurnOutSelectTimeTFs: Array<GuiTextFieldWithID> by Delegates.notNull()
 
     override fun initGui() {
         this.thisTurnOutChannelKeyPair = tile.thisTurnOutChannelKeyPair
@@ -38,6 +39,7 @@ class ReceiverTurnoutGui(private val tile: ReceiverTurnoutTile) : GuiScreenCusto
 
         this.turnOutOperation = tile.turnOutOperation
         this.turnOutSyncSelection = tile.turnOutSyncSelection
+        this.keepTurnOutSelectTime = tile.keepTurnOutSelectTime
 
         super.initGui()
         buttonList.clear()
@@ -67,13 +69,17 @@ class ReceiverTurnoutGui(private val tile: ReceiverTurnoutTile) : GuiScreenCusto
 
         textFields.clear()
         thisTurnOutChannelKeyTFs = arrayOf(
-            setTextFieldWithID(0, width / 2 - 120, 40, 40, 15, this.thisTurnOutChannelKeyPair.name),
-            setTextFieldWithID(1, width / 2 - 60, 40, 40, 15, this.thisTurnOutChannelKeyPair.number)
+            setTextFieldWithID(0, width / 2 - 190, 40, 40, 15, this.thisTurnOutChannelKeyPair.name),
+            setTextFieldWithID(1, width / 2 - 130, 40, 40, 15, this.thisTurnOutChannelKeyPair.number)
         )
 
         detectorChannelKeyTFs = arrayOf(
-            setTextFieldWithID(10, width / 2 + 20, 40, 40, 15, this.detectorChannelKey.name),
-            setTextFieldWithID(11, width / 2 + 80, 40, 40, 15, this.detectorChannelKey.number)
+            setTextFieldWithID(10, width / 2 - 50, 40, 40, 15, this.detectorChannelKey.name),
+            setTextFieldWithID(11, width / 2 + 10, 40, 40, 15, this.detectorChannelKey.number)
+        )
+
+        keepTurnOutSelectTimeTFs = arrayOf(
+            setTextFieldWithID(20, width / 2 + 120, 40, 40, 15, this.keepTurnOutSelectTime.toString())
         )
     }
 
@@ -140,6 +146,7 @@ class ReceiverTurnoutGui(private val tile: ReceiverTurnoutTile) : GuiScreenCusto
             detectorChannelKeyTFs[0].text,
             detectorChannelKeyTFs[1].text
         )
+        this.keepTurnOutSelectTime = keepTurnOutSelectTimeTFs[0].text.toInt()
 
         PacketHandler.sendPacketServer(
             ReceiverTurnoutMessage(
@@ -147,7 +154,8 @@ class ReceiverTurnoutGui(private val tile: ReceiverTurnoutTile) : GuiScreenCusto
                 this.thisTurnOutChannelKeyPair,
                 this.detectorChannelKey,
                 this.defaultTurnOutSelection,
-                this.turnOutLeftSelectRollIDs
+                this.turnOutLeftSelectRollIDs,
+                this.keepTurnOutSelectTime
             )
         )
     }
@@ -171,36 +179,48 @@ class ReceiverTurnoutGui(private val tile: ReceiverTurnoutTile) : GuiScreenCusto
     }
 
     override fun keyTyped(par1: Char, par2: Int) {
-        if (par2 == 1 || par2 == mc.gameSettings.keyBindInventory.keyCode) {
+        if (par2 == 1) {
             mc.thePlayer.closeScreen()
         } else if (currentTextField is GuiTextFieldWithID) {
             val id = (currentTextField as GuiTextFieldWithID).id
+            val mode = id / 10
             val side = id and 1
-            if (par2 == Keyboard.KEY_TAB) {
-                currentTextField.isFocused = false
-                currentTextField = getNextTextField(id)
-                currentTextField.text = ""
-                currentTextField.isFocused = true
-                currentTextField.cursorPosition = 0
-            } else {
-                if (side == 0) {
-                    if (!KeyboardUtil.isIntegerKey(par2) || par2 == Keyboard.KEY_BACK) {
-                        currentTextField.textboxKeyTyped(Character.toUpperCase(par1), par2)
-                        if (currentTextField.text.length > 3) {
-                            currentTextField.text = currentTextField.text.substring(0, 3)
+            if (mode == 0 || mode == 1) {
+                if (par2 == Keyboard.KEY_TAB) {
+                    currentTextField.isFocused = false
+                    currentTextField = getNextTextField(id)
+                    currentTextField.text = ""
+                    currentTextField.isFocused = true
+                    currentTextField.cursorPosition = 0
+                } else {
+                    if (side == 0) {
+                        if (!KeyboardUtil.isIntegerKey(par2) || par2 == Keyboard.KEY_BACK) {
+                            currentTextField.textboxKeyTyped(Character.toUpperCase(par1), par2)
+                            if (currentTextField.text.length > 3) {
+                                currentTextField.text = currentTextField.text.substring(0, 3)
+                            }
+                        }
+                    } else {
+                        if (KeyboardUtil.isIntegerKey(par2)) {
+                            currentTextField.textboxKeyTyped(par1, par2)
+                            if (currentTextField.text.length > 3) {
+                                currentTextField.text = currentTextField.text.substring(0, 3)
+                            }
                         }
                     }
-                } else {
-                    if (KeyboardUtil.isIntegerKey(par2)) {
-                        currentTextField.textboxKeyTyped(par1, par2)
-                        if (currentTextField.text.length > 3) {
-                            currentTextField.text = currentTextField.text.substring(0, 3)
-                        }
+                }
+            } else if (mode == 2) {
+                if (KeyboardUtil.isIntegerKey(par2)) {
+                    currentTextField.textboxKeyTyped(par1, par2)
+                    if (currentTextField.text.length > 3) {
+                        currentTextField.text = currentTextField.text.substring(0, 3)
                     }
                 }
             }
         } else if (par2 == 28) {
             formatSignalLevel()
+        } else if (par2 == mc.gameSettings.keyBindInventory.keyCode) {
+            mc.thePlayer.closeScreen()
         }
     }
 
@@ -211,21 +231,53 @@ class ReceiverTurnoutGui(private val tile: ReceiverTurnoutTile) : GuiScreenCusto
         }
         drawDefaultBackground()
         super.drawScreen(par1, par2, par3)
-        drawCenteredString(fontRendererObj, "This TurnOut Name", width / 2 - 70, 15, 16777215)
-        drawCenteredString(fontRendererObj, " Name     -    Number", width / 2 - 70, 25, 16777215)
-        drawCenteredString(fontRendererObj, "-", width / 2 - 70, 42, -1)
+        drawCenteredString(fontRendererObj, "This TurnOut Name", width / 2 - 140, 15, 16777215)
+        drawCenteredString(fontRendererObj, " Name     -    Number", width / 2 - 140, 25, 16777215)
+        drawCenteredString(fontRendererObj, "-", width / 2 - 140, 42, -1)
 
-        drawCenteredString(fontRendererObj, "Roll ID Target Detector", width / 2 + 70, 15, -1)
-        drawCenteredString(fontRendererObj, " Name     -    Number", width / 2 + 70, 25, -1)
-        drawCenteredString(fontRendererObj, "-", width / 2 + 70, 42, -1)
+        drawCenteredString(fontRendererObj, "Roll ID Target Detector", width / 2 + 0, 15, -1)
+        drawCenteredString(fontRendererObj, " Name     -    Number", width / 2 + 0, 25, -1)
+        drawCenteredString(fontRendererObj, "-", width / 2 + 0, 42, -1)
+
+        drawCenteredString(fontRendererObj, "keepTurnOutSelectTime[s]", width / 2 + 140, 25, -1)
 
         drawCenteredString(fontRendererObj, "ForceSelect", width / 2 + 60, 70, -1)
-        drawCenteredString(fontRendererObj, "(Auto)", width / 2 + 60, 85, if(this.turnOutOperation==EnumTurnOutSyncSelection.OFF){-1}else{OFF_COLLAR})
-        drawCenteredString(fontRendererObj, "(Left)", width / 2 + 30, 95, if(this.turnOutOperation==EnumTurnOutSyncSelection.Left){-1}else{OFF_COLLAR})
-        drawCenteredString(fontRendererObj, "(Right)", width / 2 + 90, 95, if(this.turnOutOperation==EnumTurnOutSyncSelection.Right){-1}else{OFF_COLLAR})
+        drawCenteredString(
+            fontRendererObj,
+            "(Auto)",
+            width / 2 + 60,
+            85,
+            if (this.turnOutOperation == EnumTurnOutSyncSelection.OFF) {
+                -1
+            } else {
+                OFF_COLLAR
+            }
+        )
+        drawCenteredString(
+            fontRendererObj,
+            "(Left)",
+            width / 2 + 30,
+            95,
+            if (this.turnOutOperation == EnumTurnOutSyncSelection.Left) {
+                -1
+            } else {
+                OFF_COLLAR
+            }
+        )
+        drawCenteredString(
+            fontRendererObj,
+            "(Right)",
+            width / 2 + 90,
+            95,
+            if (this.turnOutOperation == EnumTurnOutSyncSelection.Right) {
+                -1
+            } else {
+                OFF_COLLAR
+            }
+        )
 
         drawCenteredString(fontRendererObj, "Default", width / 2 - 60, 70, -1)
-        drawCenteredString(fontRendererObj, "(Redstone OFF)", width / 2 - 60, 80, -1)
+        drawCenteredString(fontRendererObj, "(RedStone OFF)", width / 2 - 60, 80, -1)
 
         drawCenteredString(fontRendererObj, "Turn Out Roll ID", width / 2 - 140, 130, -1)
         drawCenteredString(fontRendererObj, "L", width / 2 - 150, 150, -1)
@@ -238,7 +290,7 @@ class ReceiverTurnoutGui(private val tile: ReceiverTurnoutTile) : GuiScreenCusto
         drawCenteredString(fontRendererObj, "(Default)", width / 2 - 170, height, -1)
     }
 
-    companion object{
+    companion object {
         val ENABLED_COLLAR = Util.intCollar(255, 90, 90, 255)
         val OFF_COLLAR = Util.intCollar(110, 110, 110, 255)
     }

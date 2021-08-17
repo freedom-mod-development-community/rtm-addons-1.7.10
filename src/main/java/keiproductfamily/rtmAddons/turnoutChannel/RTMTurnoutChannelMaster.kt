@@ -3,34 +3,37 @@ package keiproductfamily.rtmAddons.turnoutChannel
 import keiproductfamily.rtmAddons.ChannelKeyPair
 import keiproductfamily.rtmAddons.EnumTurnOutSwitch
 import keiproductfamily.rtmAddons.EnumTurnOutSyncSelection
-import keiproductfamily.rtmAddons.detectorChannel.RTMDetectorChannelData
-import keiproductfamily.rtmAddons.detectorChannel.RTMDetectorChannelMaster
-import java.util.HashMap
-import java.util.LinkedHashMap
+import java.util.*
+import kotlin.collections.HashSet
+import kotlin.collections.component1
+import kotlin.collections.component2
+import kotlin.collections.set
 
 object RTMTurnoutChannelMaster {
-    private val channelDatas = HashMap<String, RTMTurnoutChannelData>()
+    private val channelDATAs = HashMap<String, RTMTurnoutChannelData>()
     fun getChannelData(channelName: String): RTMTurnoutChannelData? {
-        return channelDatas[channelName]
+        return channelDATAs[channelName]
     }
 
-    fun reSet(reveiver: IRTMTurnoutReceiver, from: ChannelKeyPair, to: ChannelKeyPair) {
-        val fromSet = setOf(from.keyString)
-        val toSet = setOf(to.keyString)
-        val remove = HashSet(fromSet)
-        remove.removeAll(toSet)
-        val add = HashSet(toSet)
-        add.removeAll(fromSet)
+    fun reSet(receiver: IRTMTurnoutReceiver, from: ChannelKeyPair, to: ChannelKeyPair) {
+        if (!receiver.isRemote()) {
+            val fromSet = setOf(from.keyString)
+            val toSet = setOf(to.keyString)
+            val remove = HashSet(fromSet)
+            remove.removeAll(toSet)
+            val add = HashSet(toSet)
+            add.removeAll(fromSet)
 
-        for (keyname in remove) {
-            channelDatas[keyname]?.irtmaReceivers?.remove(reveiver)
-        }
-
-        for (keyname in add) {
-            if(channelDatas[keyname] == null){
-                channelDatas[keyname] = RTMTurnoutChannelData(keyname)
+            for (keyName in remove) {
+                channelDATAs[keyName]?.iRTMTReceivers?.remove(receiver)
             }
-            channelDatas[keyname]?.irtmaReceivers?.add(reveiver)
+
+            for (keyName in add) {
+                if (channelDATAs[keyName] == null) {
+                    channelDATAs[keyName] = RTMTurnoutChannelData(keyName)
+                }
+                channelDATAs[keyName]?.iRTMTReceivers?.add(receiver)
+            }
         }
     }
 

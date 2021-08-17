@@ -15,20 +15,20 @@ import kotlin.properties.Delegates
 
 class ReceiverTrafficLightGui(private val tile: ReceiverTrafficLightTile) : GuiScreenCustom() {
     var detectorChannelKeys: Array<ChannelKeyPair> by Delegates.notNull()
-    var forcedSignalSlection: EnumForcedSignalMode by Delegates.notNull()
+    var forcedSignalSelection: EnumForcedSignalMode by Delegates.notNull()
     var turnOutSyncSelection: EnumTurnOutSyncSelection by Delegates.notNull()
     var turnOutChannelKeyPair: ChannelKeyPair by Delegates.notNull()
     var forceSelectSignal: SignalLevel by Delegates.notNull()
 
     private var signalChannelKeys: Array<Array<GuiTextFieldWithID>> by Delegates.notNull()
-    private var turnoutChannnelKeys: Array<GuiTextFieldWithID> by Delegates.notNull()
+    private var turnoutChannelKeys: Array<GuiTextFieldWithID> by Delegates.notNull()
     private var forceModeButtons: Array<EnumGuiButton<EnumForcedSignalMode>> by Delegates.notNull()
     private var turnOutSyncButtons: Array<EnumGuiButton<EnumTurnOutSyncSelection>> by Delegates.notNull()
     private var forceSelectSignalButtons: Array<EnumGuiButton<SignalLevel>> by Delegates.notNull()
 
     override fun initGui() {
         this.detectorChannelKeys = tile.detectorChannelKeys
-        this.forcedSignalSlection = tile.forcedSignalSlection
+        this.forcedSignalSelection = tile.forcedSignalSelection
         this.turnOutSyncSelection = tile.turnOutSyncSelection
         this.turnOutChannelKeyPair = tile.turnOutChannelKeyPair
         this.forceSelectSignal = tile.forceSelectSignal
@@ -67,9 +67,9 @@ class ReceiverTrafficLightGui(private val tile: ReceiverTrafficLightTile) : GuiS
         buttonList.addAll(forceSelectSignalButtons)
 
 
-        selectForcedMode(this.forcedSignalSlection)
+        selectForcedMode(this.forcedSignalSelection)
         selectTurnOutSync(this.turnOutSyncSelection)
-        turnEnabledForceSelect(this.forcedSignalSlection.force)
+        turnEnabledForceSelect(this.forcedSignalSelection.force)
 
 
         textFields.clear()
@@ -77,12 +77,12 @@ class ReceiverTrafficLightGui(private val tile: ReceiverTrafficLightTile) : GuiS
             val (first, second) = this.detectorChannelKeys[i]
             arrayOf(
                 setTextFieldWithID(i * 10, width / 2 - 120, 30 + 20 * i, 40, 15, first),
-                setTextFieldWithID(i * 10 + 1, width / 2 - 60, 30 + 20 * i, 40, 15, second.toString())
+                setTextFieldWithID(i * 10 + 1, width / 2 - 60, 30 + 20 * i, 40, 15, second)
             )
         }
-        turnoutChannnelKeys = arrayOf(
+        turnoutChannelKeys = arrayOf(
             setTextFieldWithID(100, width / 2, 35, 40, 15, this.turnOutChannelKeyPair.name),
-            setTextFieldWithID(101, width / 2 + 50, 35, 40, 15, this.turnOutChannelKeyPair.number.toString()),
+            setTextFieldWithID(101, width / 2 + 50, 35, 40, 15, this.turnOutChannelKeyPair.number),
         )
     }
 
@@ -97,24 +97,24 @@ class ReceiverTrafficLightGui(private val tile: ReceiverTrafficLightTile) : GuiS
     }
 
     fun selectForcedMode(mode: EnumForcedSignalMode) {
-        this.forcedSignalSlection = mode
-        for (enumbutton in forceModeButtons) {
-            enumbutton.enabled = enumbutton.value != this.forcedSignalSlection
+        this.forcedSignalSelection = mode
+        for (enumButton in forceModeButtons) {
+            enumButton.enabled = enumButton.value != this.forcedSignalSelection
         }
-        turnEnabledForceSelect(this.forcedSignalSlection.force)
+        turnEnabledForceSelect(this.forcedSignalSelection.force)
     }
 
     fun selectTurnOutSync(mode: EnumTurnOutSyncSelection) {
         this.turnOutSyncSelection = mode
-        for (enumbutton in turnOutSyncButtons) {
-            enumbutton.enabled = enumbutton.value != this.turnOutSyncSelection
+        for (enumButton in turnOutSyncButtons) {
+            enumButton.enabled = enumButton.value != this.turnOutSyncSelection
         }
     }
 
     fun selectForceSelectSignal(signal: SignalLevel) {
         this.forceSelectSignal = signal
-        for (enumbutton in forceSelectSignalButtons) {
-            enumbutton.enabled = enumbutton.value != this.forceSelectSignal
+        for (enumButton in forceSelectSignalButtons) {
+            enumButton.enabled = enumButton.value != this.forceSelectSignal
         }
     }
 
@@ -153,15 +153,15 @@ class ReceiverTrafficLightGui(private val tile: ReceiverTrafficLightTile) : GuiS
             )
         }
         val turnoutChannelKey = ChannelKeyPair(
-            turnoutChannnelKeys[0].text,
-            turnoutChannnelKeys[1].text
+            turnoutChannelKeys[0].text,
+            turnoutChannelKeys[1].text
         )
 
         PacketHandler.sendPacketServer(
             ReceiverTrafficLightMessage(
                 tile,
                 detectorChannelKeys,
-                this.forcedSignalSlection,
+                this.forcedSignalSelection,
                 this.turnOutSyncSelection,
                 turnoutChannelKey,
                 this.forceSelectSignal
@@ -190,15 +190,15 @@ class ReceiverTrafficLightGui(private val tile: ReceiverTrafficLightTile) : GuiS
             }
         } else {
             return if (nowID and 1 == 0) {
-                turnoutChannnelKeys[1]
+                turnoutChannelKeys[1]
             } else {
-                turnoutChannnelKeys[0]
+                turnoutChannelKeys[0]
             }
         }
     }
 
     override fun keyTyped(par1: Char, par2: Int) {
-        if (par2 == 1 || par2 == mc.gameSettings.keyBindInventory.keyCode) {
+        if (par2 == 1) {
             mc.thePlayer.closeScreen()
         } else if (currentTextField is GuiTextFieldWithID) {
             val id = (currentTextField as GuiTextFieldWithID).id
@@ -226,13 +226,13 @@ class ReceiverTrafficLightGui(private val tile: ReceiverTrafficLightTile) : GuiS
                     }
                 }
             }
-        } else if (currentTextField in turnoutChannnelKeys) {
+        } else if (currentTextField in turnoutChannelKeys) {
             val id = (currentTextField as GuiTextFieldWithID).id
             val side = id and 1
             if (side == 0) {
                 if (par2 == Keyboard.KEY_TAB) {
                     currentTextField.isFocused = false
-                    currentTextField = turnoutChannnelKeys[1]
+                    currentTextField = turnoutChannelKeys[1]
                     currentTextField.text = ""
                     currentTextField.isFocused = true
                     currentTextField.cursorPosition = 0
@@ -245,7 +245,7 @@ class ReceiverTrafficLightGui(private val tile: ReceiverTrafficLightTile) : GuiS
             } else {
                 if (par2 == Keyboard.KEY_TAB) {
                     currentTextField.isFocused = false
-                    currentTextField = turnoutChannnelKeys[0]
+                    currentTextField = turnoutChannelKeys[0]
                     currentTextField.text = ""
                     currentTextField.isFocused = true
                     currentTextField.cursorPosition = 0
@@ -258,11 +258,13 @@ class ReceiverTrafficLightGui(private val tile: ReceiverTrafficLightTile) : GuiS
             }
         } else if (par2 == 28) {
             formatSignalLevel()
+        } else if (par2 == mc.gameSettings.keyBindInventory.keyCode) {
+            mc.thePlayer.closeScreen()
         }
     }
 
     override fun drawScreen(par1: Int, par2: Int, par3: Float) {
-        if(tile.isUpdate){
+        if (tile.isUpdate) {
             this.initGui()
             tile.isUpdate = false
         }

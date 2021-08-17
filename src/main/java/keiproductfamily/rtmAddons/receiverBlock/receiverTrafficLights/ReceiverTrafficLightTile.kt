@@ -4,7 +4,10 @@ import jp.ngt.rtm.electric.IProvideElectricity
 import jp.ngt.rtm.electric.SignalLevel
 import keiproductfamily.*
 import keiproductfamily.normal.TileNormal
-import keiproductfamily.rtmAddons.*
+import keiproductfamily.rtmAddons.ChannelKeyPair
+import keiproductfamily.rtmAddons.EnumForcedSignalMode
+import keiproductfamily.rtmAddons.EnumTurnOutSwitch
+import keiproductfamily.rtmAddons.EnumTurnOutSyncSelection
 import keiproductfamily.rtmAddons.detectorChannel.IRTMDetectorReceiver
 import keiproductfamily.rtmAddons.detectorChannel.RTMDetectorChannelMaster
 import keiproductfamily.rtmAddons.turnoutChannel.IRTMTurnoutReceiver
@@ -13,41 +16,40 @@ import net.minecraft.nbt.NBTTagCompound
 
 class ReceiverTrafficLightTile : TileNormal(), IRTMDetectorReceiver, IRTMTurnoutReceiver, IProvideElectricity {
     var detectorChannelKeys = Array(6) { ChannelKeyPair("", "") }
-    var forcedSignalSlection = EnumForcedSignalMode.Auto
+        set(channelKeys: Array<ChannelKeyPair>) {
+            if (this.detectorChannelKeys.size == channelKeys.size) {
+                RTMDetectorChannelMaster.reSet(this, this.detectorChannelKeys, channelKeys)
+                field = channelKeys
+                isUpdate = true
+            }
+        }
+
+    var forcedSignalSelection = EnumForcedSignalMode.Auto
     var turnOutSyncSelection = EnumTurnOutSyncSelection.OFF
     var turnOutChannelKeyPair = ChannelKeyPair("", "")
+        set(channelKey: ChannelKeyPair) {
+            RTMTurnoutChannelMaster.reSet(this, this.turnOutChannelKeyPair, channelKey)
+            field = channelKey
+            this.markDirtyAndNotify()
+            isUpdate = true
+        }
+
     var forceSelectSignal = SignalLevel.STOP
 
     var nowTurnOutSwitch = EnumTurnOutSyncSelection.OFF
     var isUpdate: Boolean = false
 
-    fun setDetectorChunnelKeys(channelKeys: Array<ChannelKeyPair>) {
-        if (this.detectorChannelKeys.size == channelKeys.size) {
-            RTMDetectorChannelMaster.reSet(this, this.detectorChannelKeys, channelKeys)
-            this.detectorChannelKeys = channelKeys
-            this.markDirtyAndNotify()
-            this.markDirty()
-            isUpdate = true
-        }
-    }
-
-    fun setTurnoutChunnelKey(channelKey: ChannelKeyPair) {
-        RTMTurnoutChannelMaster.reSet(this, this.turnOutChannelKeyPair, channelKey)
-        this.turnOutChannelKeyPair = channelKey
-        this.markDirtyAndNotify()
-        this.markDirty()
-        isUpdate = true
-    }
 
     fun setDatas(
         forcedSignalSlection: EnumForcedSignalMode = EnumForcedSignalMode.Auto,
         turnOutSyncSelection: EnumTurnOutSyncSelection = EnumTurnOutSyncSelection.OFF,
         forceSelectSignal: SignalLevel = SignalLevel.STOP
     ) {
-        this.forcedSignalSlection = forcedSignalSlection
+        this.forcedSignalSelection = forcedSignalSlection
         this.turnOutSyncSelection = turnOutSyncSelection
         this.forceSelectSignal = forceSelectSignal
         this.markDirtyAndNotify()
+        isUpdate = true
     }
 
     override fun validate() {
@@ -72,7 +74,7 @@ class ReceiverTrafficLightTile : TileNormal(), IRTMDetectorReceiver, IRTMTurnout
     override fun onNewTurnoutNowSwitch(channelKey: String, nowSide: EnumTurnOutSwitch): Boolean {
         if (channelKey == turnOutChannelKeyPair.keyString) {
             val newValue = nowSide.toEnumTurnOutSyncSelection()
-            if(nowTurnOutSwitch != newValue) {
+            if (nowTurnOutSwitch != newValue) {
                 nowTurnOutSwitch = newValue
                 changeNotify()
             }
@@ -100,14 +102,18 @@ class ReceiverTrafficLightTile : TileNormal(), IRTMDetectorReceiver, IRTMTurnout
         }
     }
 
-    fun changeNotify(){
+    override fun isRemote(): Boolean {
+        return worldObj?.isRemote ?: false
+    }
+
+    fun changeNotify() {
         this.worldObj.notifyBlockOfNeighborChange(xCoord, yCoord, zCoord, this.blockType)
     }
 
 
     private var _electricityAuto: Int = 0
     override fun getElectricity(): Int {
-        return if (forcedSignalSlection.force) {
+        return if (forcedSignalSelection.force) {
             forceSelectSignal.level
         } else if (turnOutSyncSelection == EnumTurnOutSyncSelection.OFF) {
             _electricityAuto
@@ -124,11 +130,10 @@ class ReceiverTrafficLightTile : TileNormal(), IRTMDetectorReceiver, IRTMTurnout
 
     override fun readFromNBT(nbt: NBTTagCompound) {
         super.readFromNBT(nbt)
-        val cks = nbt.getChannelKeyPairArray("detectorChannelKeys")
-        setDetectorChunnelKeys(cks)
-        this.forcedSignalSlection = EnumForcedSignalMode.getType(nbt.getInteger("forcedSignalSlection"))
+        detectorChannelKeys = nbt.getChannelKeyPairArray("detectorChannelKeys")
+        this.forcedSignalSelection = EnumForcedSignalMode.getType(nbt.getInteger("forcedSignalSlection"))
         this.turnOutSyncSelection = EnumTurnOutSyncSelection.getType(nbt.getInteger("turnOutSyncSelection"))
-        this.turnOutChannelKeyPair = nbt.getChannelKeyPair("turnOutChannnelKeyPair")
+        turnOutChannelKeyPair = nbt.getChannelKeyPair("turnOutChannnelKeyPair")
         this.forceSelectSignal = SignalLevel.getSignal(nbt.getInteger("forceSelectSignal"))
         this._electricityAuto = nbt.getInteger("electricity")
     }
@@ -136,7 +141,7 @@ class ReceiverTrafficLightTile : TileNormal(), IRTMDetectorReceiver, IRTMTurnout
     override fun writeToNBT(nbt: NBTTagCompound) {
         super.writeToNBT(nbt)
         nbt.setChannelKeyPairArray("detectorChannelKeys", detectorChannelKeys)
-        nbt.setInteger("forcedSignalSlection", forcedSignalSlection.id)
+        nbt.setInteger("forcedSignalSlection", forcedSignalSelection.id)
         nbt.setInteger("turnOutSyncSelection", turnOutSyncSelection.id)
         nbt.setChannelKeyPair("turnOutChannnelKeyPair", turnOutChannelKeyPair)
         nbt.setInteger("forceSelectSignal", forceSelectSignal.level)

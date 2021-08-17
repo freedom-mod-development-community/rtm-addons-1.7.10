@@ -7,16 +7,16 @@ import cpw.mods.fml.relauncher.Side
 import io.netty.buffer.ByteBuf
 import jp.ngt.rtm.electric.SignalLevel
 import keiproductfamily.network.PacketHandler
+import keiproductfamily.network.TileEntityMessage
 import keiproductfamily.rtmAddons.ChannelKeyPair
 import keiproductfamily.rtmAddons.EnumForcedSignalMode
 import keiproductfamily.rtmAddons.EnumTurnOutSyncSelection
-import keiproductfamily.network.TileEntityMessage
 import kotlin.properties.Delegates
 
 class ReceiverTrafficLightMessage : TileEntityMessage, IMessageHandler<ReceiverTrafficLightMessage?, IMessage?> {
     var tile: ReceiverTrafficLightTile by Delegates.notNull()
     var detectorChannelKeys: Array<ChannelKeyPair> by Delegates.notNull()
-    var forcedSignalSlection: EnumForcedSignalMode by Delegates.notNull()
+    var forcedSignalSelection: EnumForcedSignalMode by Delegates.notNull()
     var turnOutSyncSelection: EnumTurnOutSyncSelection by Delegates.notNull()
     var turnOutChannelKeyPair: ChannelKeyPair by Delegates.notNull()
     var forceSelectSignal: SignalLevel by Delegates.notNull()
@@ -26,13 +26,13 @@ class ReceiverTrafficLightMessage : TileEntityMessage, IMessageHandler<ReceiverT
     constructor(
         tile: ReceiverTrafficLightTile,
         detectorChannelKeys: Array<ChannelKeyPair>,
-        forcedSignalSlection: EnumForcedSignalMode,
+        forcedSignalSelection: EnumForcedSignalMode,
         turnOutSyncSelection: EnumTurnOutSyncSelection,
         turnOutChannelKey: ChannelKeyPair,
         forceSelectSignal: SignalLevel
     ) : super(tile) {
         this.detectorChannelKeys = detectorChannelKeys
-        this.forcedSignalSlection = forcedSignalSlection
+        this.forcedSignalSelection = forcedSignalSelection
         this.turnOutSyncSelection = turnOutSyncSelection
         this.turnOutChannelKeyPair = turnOutChannelKey
         this.forceSelectSignal = forceSelectSignal
@@ -43,7 +43,7 @@ class ReceiverTrafficLightMessage : TileEntityMessage, IMessageHandler<ReceiverT
         this.detectorChannelKeys = Array<ChannelKeyPair>(cnt) {
             ChannelKeyPair.readFromBuf(buf)
         }
-        this.forcedSignalSlection = EnumForcedSignalMode.getType(buf.readInt())
+        this.forcedSignalSelection = EnumForcedSignalMode.getType(buf.readInt())
         this.turnOutSyncSelection = EnumTurnOutSyncSelection.getType(buf.readInt())
         this.turnOutChannelKeyPair = ChannelKeyPair.readFromBuf(buf)
         this.forceSelectSignal = SignalLevel.getSignal(buf.readInt())
@@ -54,7 +54,7 @@ class ReceiverTrafficLightMessage : TileEntityMessage, IMessageHandler<ReceiverT
         for(pair in detectorChannelKeys) {
             pair.writeToByteBuf(buf)
         }
-        buf.writeInt(forcedSignalSlection.id)
+        buf.writeInt(forcedSignalSelection.id)
         buf.writeInt(turnOutSyncSelection.id)
         turnOutChannelKeyPair.writeToByteBuf(buf)
         buf.writeInt(forceSelectSignal.level)
@@ -63,10 +63,10 @@ class ReceiverTrafficLightMessage : TileEntityMessage, IMessageHandler<ReceiverT
     override fun onMessage(message: ReceiverTrafficLightMessage?, ctx: MessageContext): IMessage? {
         val tile = message?.getTileEntity(ctx)
         if (tile is ReceiverTrafficLightTile) {
-            tile.setDetectorChunnelKeys(message.detectorChannelKeys)
-            tile.setTurnoutChunnelKey(message.turnOutChannelKeyPair)
+            tile.detectorChannelKeys = message.detectorChannelKeys
+            tile.turnOutChannelKeyPair = message.turnOutChannelKeyPair
             tile.setDatas(
-                message.forcedSignalSlection,
+                message.forcedSignalSelection,
                 message.turnOutSyncSelection,
                 message.forceSelectSignal
             )

@@ -6,9 +6,9 @@ import cpw.mods.fml.common.network.simpleimpl.MessageContext
 import cpw.mods.fml.relauncher.Side
 import io.netty.buffer.ByteBuf
 import keiproductfamily.network.PacketHandler
+import keiproductfamily.network.TileEntityMessage
 import keiproductfamily.rtmAddons.ChannelKeyPair
 import keiproductfamily.rtmAddons.EnumTurnOutSwitch
-import keiproductfamily.network.TileEntityMessage
 import java.util.*
 import kotlin.collections.HashSet
 import kotlin.properties.Delegates
@@ -19,6 +19,7 @@ class ReceiverTurnoutMessage : TileEntityMessage, IMessageHandler<ReceiverTurnou
     var detectorChannelKey: ChannelKeyPair by Delegates.notNull()
     var defaultTurnOutSelection: EnumTurnOutSwitch by Delegates.notNull()
     var turnOutSelectRollIDs: BitSet by Delegates.notNull()
+    var keepTurnOutSelectTime: Int by Delegates.notNull()
 
     constructor()
 
@@ -27,12 +28,14 @@ class ReceiverTurnoutMessage : TileEntityMessage, IMessageHandler<ReceiverTurnou
         thisTurnOutChannelKeyPair: ChannelKeyPair,
         detectorChannelKey: ChannelKeyPair,
         defaultTurnOutSelection: EnumTurnOutSwitch,
-        turnOutSelectRollIDs: BitSet
+        turnOutSelectRollIDs: BitSet,
+        keepTurnOutSelectTime: Int
     ) : super(tile) {
         this.thisTurnOutChannelKeyPair = thisTurnOutChannelKeyPair
         this.detectorChannelKey = detectorChannelKey
         this.defaultTurnOutSelection = defaultTurnOutSelection
         this.turnOutSelectRollIDs = turnOutSelectRollIDs
+        this.keepTurnOutSelectTime = keepTurnOutSelectTime
     }
 
     override fun read(buf: ByteBuf) {
@@ -47,6 +50,7 @@ class ReceiverTurnoutMessage : TileEntityMessage, IMessageHandler<ReceiverTurnou
                 this.turnOutSelectRollIDs[id] = true
             }
         }
+        this.keepTurnOutSelectTime = buf.readInt()
     }
 
     override fun write(buf: ByteBuf) {
@@ -73,18 +77,20 @@ class ReceiverTurnoutMessage : TileEntityMessage, IMessageHandler<ReceiverTurnou
         for (bit in array) {
             buf.writeInt(bit)
         }
+
+        buf.writeInt(keepTurnOutSelectTime)
     }
 
     override fun onMessage(message: ReceiverTurnoutMessage?, ctx: MessageContext): IMessage? {
         val tile = message?.getTileEntity(ctx)
         if (tile is ReceiverTurnoutTile) {
-            tile.setThisTurnoutChunnelKey(message.thisTurnOutChannelKeyPair)
-            tile.setDetectorChunnelKey(message.detectorChannelKey)
+            tile.thisTurnOutChannelKeyPair = message.thisTurnOutChannelKeyPair
+            tile.detectorChannelKey = message.detectorChannelKey
             tile.setDatas(
                 message.defaultTurnOutSelection,
-                message.turnOutSelectRollIDs
+                message.turnOutSelectRollIDs,
+                message.keepTurnOutSelectTime
             )
-            tile.markDirtyAndNotify()
             if (ctx.side == Side.SERVER) {
                 PacketHandler.sendPacketAll(message)
             }

@@ -2,8 +2,7 @@ package keiproductfamily.rtmAddons.trainDetector;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import jp.ngt.rtm.CreativeTabRTM;
-import jp.ngt.rtm.electric.*;
+import jp.ngt.rtm.electric.MachineType;
 import jp.ngt.rtm.entity.EntityInstalledObject;
 import jp.ngt.rtm.item.ItemWithModel;
 import jp.ngt.rtm.rail.TileEntityLargeRailBase;
@@ -11,7 +10,6 @@ import jp.ngt.rtm.rail.util.RailMap;
 import keiproductfamily.ModKEIProductFamily;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.texture.IIconRegister;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
@@ -57,7 +55,7 @@ public class ItemTrainDetectorAdvance  extends ItemWithModel {
             }
 
             if (block != null) {
-                world.playSoundEffect((double)par4 + 0.5D, (double)par5 + 0.5D, (double)par6 + 0.5D, ((Block)block).stepSound.func_150496_b(), (((Block)block).stepSound.getVolume() + 1.0F) / 2.0F, ((Block)block).stepSound.getPitch() * 0.8F);
+                world.playSoundEffect((double)par4 + 0.5D, (double)par5 + 0.5D, (double)par6 + 0.5D, block.stepSound.func_150496_b(), (block.stepSound.getVolume() + 1.0F) / 2.0F, block.stepSound.getPitch() * 0.8F);
                 --itemStack.stackSize;
             }
         }
@@ -66,7 +64,7 @@ public class ItemTrainDetectorAdvance  extends ItemWithModel {
     }
 
     public boolean setEntityOnRail(World world, EntityInstalledObject entity, int x, int y, int z, EntityPlayer player, ItemStack stack) {
-        RailMap rm0 = TileEntityLargeRailBase.getRailMapFromCoordinates(world, (Entity)null, (double)x, (double)y, (double)z);
+        RailMap rm0 = TileEntityLargeRailBase.getRailMapFromCoordinates(world, null, x, y, z);
         if (rm0 == null) {
             return false;
         } else {

@@ -38,7 +38,7 @@ class MessageTrainDetectorAdvance : IMessage, IMessageHandler<MessageTrainDetect
     override fun onMessage(message: MessageTrainDetectorAdvance?, ctx: MessageContext?): IMessage? {
         val entity = message?.let { ctx?.currentWorld?.getEntityByID(it.entityID) }
         if (entity is EntityTrainDetectorAdvance) {
-            entity.setChunnelName(message.channelName, message.channelNumber)
+            entity.setChannelName(message.channelName, message.channelNumber)
             if (ctx?.side == Side.SERVER) {
                 PacketHandler.sendPacketAll(message)
             }

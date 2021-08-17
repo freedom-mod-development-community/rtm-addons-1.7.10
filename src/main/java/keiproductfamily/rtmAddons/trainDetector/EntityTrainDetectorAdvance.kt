@@ -6,6 +6,7 @@ import jp.ngt.rtm.entity.train.EntityBogie
 import jp.ngt.rtm.entity.train.EntityTrainBase
 import jp.ngt.rtm.item.ItemWire
 import keiproductfamily.*
+import keiproductfamily.PermissionList.IParmission
 import keiproductfamily.network.PacketHandler
 import keiproductfamily.rtmAddons.ChannelKeyPair
 import keiproductfamily.rtmAddons.RequestEntityNBTData
@@ -16,7 +17,7 @@ import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.world.World
 
-class EntityTrainDetectorAdvance(world: World?) : EntityElectricalWiring(world) {
+class EntityTrainDetectorAdvance(world: World?) : EntityElectricalWiring(world), IParmission {
     private var findTrain = false
     var channelKeyPair: ChannelKeyPair = ChannelKeyPair("", "")
 
@@ -43,7 +44,7 @@ class EntityTrainDetectorAdvance(world: World?) : EntityElectricalWiring(world) 
     val channelKey: String
         get() = channelKeyPair.keyString
 
-    fun setChunnelName(channelName: String, channelNumber: String) {
+    fun setChannelName(channelName: String, channelNumber: String) {
         val name = channelName.trim { it <= ' ' }
         val number = channelNumber.trim { it <= ' ' }
         if (channelKeyPair.name != name || channelKeyPair.number != number) {
@@ -139,5 +140,9 @@ class EntityTrainDetectorAdvance(world: World?) : EntityElectricalWiring(world) 
     init {
         setSize(1.0f, 0.0625f)
         ignoreFrustumCheck = true
+    }
+
+    override fun getName(): String {
+        return "EntityTrainDetectorAdvance"
     }
 }
