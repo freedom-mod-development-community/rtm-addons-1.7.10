@@ -2,7 +2,7 @@ package keiproductfamily.PermissionList;
 
 class PermissionDefault {
     static String defaultHodler =
-            "#2021/03/23\n" +
+            "#2021/08/03\n" +
                     "PermissionFileReLoad{\n" +
                     " ServerMaintainer\n" +
                     " KEI\n" +
@@ -24,30 +24,66 @@ class PermissionDefault {
                     "\n" +
                     "TAWSendItem{\n" +
                     " Tokyu\n" +
+                    " NNR\n" +
                     " KEI\n" +
                     "}\n" +
                     "TAWReceiveBlock{\n" +
                     " Tokyu\n" +
+                    " NNR\n" +
                     " KEI\n" +
                     "}\n" +
                     "TPRReceiveItem{\n" +
                     " Tokyu\n" +
+                    " NNR\n" +
                     " KEI\n" +
                     "}\n" +
                     "TPRSendBlock{\n" +
                     " Tokyu\n" +
+                    " NNR\n" +
                     " KEI\n" +
                     "}\n" +
                     "TPRSendItem{\n" +
                     " Tokyu\n" +
+                    " NNR\n" +
                     " KEI\n" +
-                    "}";
+                    "}\n" +
+                    "ReceiverTrafficLight{\n" +
+                    " Tokyu\n" +
+                    " UnEx\n" +
+                    " NNR\n" +
+                    " KEI\n" +
+                    "}\n" +
+                    "ReceiverTurnout{\n" +
+                    " Tokyu\n" +
+                    " UnEx\n" +
+                    " NNR\n" +
+                    " KEI\n" +
+                    "}\n" +
+                    "SCWirelessAdvance{\n" +
+                    " Tokyu\n" +
+                    " UnEx\n" +
+                    " NNR\n" +
+                    " KEI\n" +
+                    "}\n" +
+                    "EntityTrainDetectorAdvance{\n" +
+                    " Tokyu\n" +
+                    " UnEx\n" +
+                    " NNR\n" +
+                    " KEI\n" +
+                    "}\n" +
+                    "TurnoutSelector{\n" +
+                    " Tokyu\n" +
+                    " UnEx\n" +
+                    " NNR\n" +
+                    " KEI\n" +
+                    "}\n" +
+                    "";
 
     static String defaultCompany =
-            "#2021/03/23\n" +
+            "#2021/08/03\n" +
                     "ServerMaintainer{\n" +
+                    " anatawa12\n" +
                     " kuma_yamamoto\n" +
-                    " Dorosii\n" +
                     " debuger\n" +
                     "}\n" +
                     "MTT{\n" +
@@ -62,5 +98,15 @@ class PermissionDefault {
                     "}\n" +
                     "KEI{\n" +
                     " kuma_yamamoto\n" +
-                    "}\n";
+                    " debuger\n" +
+                    "}\n" +
+                    "UnEx{\n" +
+                    " kaka_256\n" +
+                    " debuger\n" +
+                    "}\n" +
+                    "NNR{\n" +
+                    " sagen_eins\n" +
+                    " debuger\n" +
+                    "}\n"
+            ;
 }
