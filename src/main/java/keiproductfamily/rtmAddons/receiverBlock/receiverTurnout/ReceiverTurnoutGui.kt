@@ -17,6 +17,7 @@ import kotlin.properties.Delegates
 class ReceiverTurnoutGui(private val tile: ReceiverTurnoutTile) : GuiScreenCustom() {
     var thisTurnOutChannelKeyPair: ChannelKeyPair by Delegates.notNull()
     var detectorChannelKey: ChannelKeyPair by Delegates.notNull()
+    var rsOFFTurnOutSelection: EnumTurnOutSwitch by Delegates.notNull()
     var defaultTurnOutSelection: EnumTurnOutSwitch by Delegates.notNull()
     var turnOutLeftSelectRollIDs: BitSet by Delegates.notNull()
     var keepTurnOutSelectTime: Int by Delegates.notNull()
@@ -26,6 +27,7 @@ class ReceiverTurnoutGui(private val tile: ReceiverTurnoutTile) : GuiScreenCusto
 
     private var thisTurnOutChannelKeyTFs: Array<GuiTextFieldWithID> by Delegates.notNull()
     private var detectorChannelKeyTFs: Array<GuiTextFieldWithID> by Delegates.notNull()
+    private var rsOFFSelectButtons: Array<EnumGuiButton<EnumTurnOutSwitch>> by Delegates.notNull()
     private var defaultTurnOutSelectButtons: Array<EnumGuiButton<EnumTurnOutSwitch>> by Delegates.notNull()
     private var turnOutSelectRollIDButtons: EnumMap<EnumTurnOutSwitch, Array<GuiButton>> by Delegates.notNull()
     private var keepTurnOutSelectTimeTFs: Array<GuiTextFieldWithID> by Delegates.notNull()
@@ -33,6 +35,7 @@ class ReceiverTurnoutGui(private val tile: ReceiverTurnoutTile) : GuiScreenCusto
     override fun initGui() {
         this.thisTurnOutChannelKeyPair = tile.thisTurnOutChannelKeyPair
         this.detectorChannelKey = tile.detectorChannelKey
+        this.rsOFFTurnOutSelection = tile.rsOFFTurnOutSelection
         this.defaultTurnOutSelection = tile.defaultTurnOutSelection
         this.turnOutLeftSelectRollIDs = tile.turnOutLeftSelectRollIDs
 
@@ -45,9 +48,16 @@ class ReceiverTurnoutGui(private val tile: ReceiverTurnoutTile) : GuiScreenCusto
         buttonList.add(GuiButton(0, width / 2 - 155, height - 28, 150, 20, I18n.format("gui.done", *arrayOfNulls(0))))
         buttonList.add(GuiButton(1, width / 2 + 5, height - 28, 150, 20, I18n.format("gui.cancel", *arrayOfNulls(0))))
 
+        rsOFFSelectButtons = arrayOf(
+            EnumGuiButton(12, width / 2 - 160, 90, 30, 20, "Left", EnumTurnOutSwitch.Left),
+            EnumGuiButton(13, width / 2 - 110, 90, 30, 20, "Right", EnumTurnOutSwitch.Right)
+        )
+        buttonList.addAll(rsOFFSelectButtons)
+        setRSOFFSide(rsOFFTurnOutSelection)
+
         defaultTurnOutSelectButtons = arrayOf(
-            EnumGuiButton(10, width / 2 - 100, 90, 30, 20, "Left", EnumTurnOutSwitch.Left),
-            EnumGuiButton(11, width / 2 - 50, 90, 30, 20, "Right", EnumTurnOutSwitch.Right)
+            EnumGuiButton(10, width / 2 - 50, 90, 30, 20, "Left", EnumTurnOutSwitch.Left),
+            EnumGuiButton(11, width / 2 - 0, 90, 30, 20, "Right", EnumTurnOutSwitch.Right)
         )
         buttonList.addAll(defaultTurnOutSelectButtons)
         setDefaultTurn(defaultTurnOutSelection)
@@ -98,6 +108,8 @@ class ReceiverTurnoutGui(private val tile: ReceiverTurnoutTile) : GuiScreenCusto
             sendPacket()
         } else if (button.id == 1) {
             mc.displayGuiScreen(null as GuiScreen?)
+        } else if (rsOFFSelectButtons.contains(button)) {
+            setRSOFFSide((button as EnumGuiButton<EnumTurnOutSwitch>).value)
         } else if (defaultTurnOutSelectButtons.contains(button)) {
             setDefaultTurn((button as EnumGuiButton<EnumTurnOutSwitch>).value)
         } else if (button.id / 10 in 2..5) {
@@ -119,6 +131,13 @@ class ReceiverTurnoutGui(private val tile: ReceiverTurnoutTile) : GuiScreenCusto
             setDefaultTurn((button as EnumGuiButton<EnumTurnOutSwitch>).value)
         }
         super.actionPerformed(button)
+    }
+
+    fun setRSOFFSide(rsOFFSide: EnumTurnOutSwitch) {
+        this.rsOFFTurnOutSelection = rsOFFSide
+        for (button in rsOFFSelectButtons) {
+            button.enabled = button.value != this.rsOFFTurnOutSelection
+        }
     }
 
     fun setDefaultTurn(defaultSide: EnumTurnOutSwitch) {
@@ -152,6 +171,7 @@ class ReceiverTurnoutGui(private val tile: ReceiverTurnoutTile) : GuiScreenCusto
                 tile,
                 this.thisTurnOutChannelKeyPair,
                 this.detectorChannelKey,
+                this.rsOFFTurnOutSelection,
                 this.defaultTurnOutSelection,
                 this.turnOutLeftSelectRollIDs,
                 this.keepTurnOutSelectTime
@@ -240,11 +260,11 @@ class ReceiverTurnoutGui(private val tile: ReceiverTurnoutTile) : GuiScreenCusto
 
         drawCenteredString(fontRendererObj, "keepTurnOutSelectTime[s]", width / 2 + 140, 25, -1)
 
-        drawCenteredString(fontRendererObj, "ForceSelect", width / 2 + 60, 70, -1)
+        drawCenteredString(fontRendererObj, "ForceSelect", width / 2 + 110, 70, -1)
         drawCenteredString(
             fontRendererObj,
             "(Auto)",
-            width / 2 + 60,
+            width / 2 + 110,
             85,
             if (this.turnOutOperation == EnumTurnOutSyncSelection.OFF) {
                 -1
@@ -255,7 +275,7 @@ class ReceiverTurnoutGui(private val tile: ReceiverTurnoutTile) : GuiScreenCusto
         drawCenteredString(
             fontRendererObj,
             "(Left)",
-            width / 2 + 30,
+            width / 2 + 80,
             95,
             if (this.turnOutOperation == EnumTurnOutSyncSelection.Left) {
                 -1
@@ -266,7 +286,7 @@ class ReceiverTurnoutGui(private val tile: ReceiverTurnoutTile) : GuiScreenCusto
         drawCenteredString(
             fontRendererObj,
             "(Right)",
-            width / 2 + 90,
+            width / 2 + 140,
             95,
             if (this.turnOutOperation == EnumTurnOutSyncSelection.Right) {
                 -1
@@ -275,8 +295,11 @@ class ReceiverTurnoutGui(private val tile: ReceiverTurnoutTile) : GuiScreenCusto
             }
         )
 
-        drawCenteredString(fontRendererObj, "Default", width / 2 - 60, 70, -1)
-        drawCenteredString(fontRendererObj, "(RedStone OFF)", width / 2 - 60, 80, -1)
+        drawCenteredString(fontRendererObj, "Default", width / 2 - 10, 70, -1)
+        drawCenteredString(fontRendererObj, "Turn Out Side", width / 2 - 10, 80, -1)
+
+        drawCenteredString(fontRendererObj, "RS OFF", width / 2 - 120, 70, -1)
+        drawCenteredString(fontRendererObj, "Turn Out Side", width / 2 - 120, 80, -1)
 
         drawCenteredString(fontRendererObj, "Turn Out Roll ID", width / 2 - 140, 130, -1)
         drawCenteredString(fontRendererObj, "L", width / 2 - 150, 150, -1)

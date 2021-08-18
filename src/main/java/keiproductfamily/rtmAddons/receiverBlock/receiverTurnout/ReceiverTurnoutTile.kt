@@ -1,5 +1,6 @@
 package keiproductfamily.rtmAddons.receiverBlock.receiverTurnout
 
+import jp.kaiz.kaizpatch.fixrtm.threadFactoryWithPrefix
 import jp.ngt.rtm.electric.IProvideElectricity
 import jp.ngt.rtm.electric.SignalLevel
 import keiproductfamily.ModCommonVar
@@ -53,6 +54,11 @@ class ReceiverTurnoutTile : TileNormal(), IRTMDetectorReceiver, IRTMTurnoutRecei
     /**
      * デフォルト（RS出力なし）での分岐の方向
      */
+    var rsOFFTurnOutSelection = EnumTurnOutSwitch.Right
+
+    /**
+     * 通常時の分岐開通の方向
+     */
     var defaultTurnOutSelection = EnumTurnOutSwitch.Right
 
     /**
@@ -94,11 +100,14 @@ class ReceiverTurnoutTile : TileNormal(), IRTMDetectorReceiver, IRTMTurnoutRecei
     var isUpdate: Boolean = false
 
     fun setDatas(
+        rsOFFTurnOutSelection: EnumTurnOutSwitch,
         defaultTurnOutSelection: EnumTurnOutSwitch,
         turnOutLeftSelectRollIDs: BitSet,
         keepTurnOutSelectTime: Int
     ) {
+        this.rsOFFTurnOutSelection = rsOFFTurnOutSelection
         this.defaultTurnOutSelection = defaultTurnOutSelection
+        this.turnOutSyncSelection = defaultTurnOutSelection
         this.turnOutLeftSelectRollIDs = turnOutLeftSelectRollIDs
         this.keepTurnOutSelectTime = keepTurnOutSelectTime
         RTMDetectorChannelMaster.reCallList(this)
@@ -230,7 +239,7 @@ class ReceiverTurnoutTile : TileNormal(), IRTMDetectorReceiver, IRTMTurnoutRecei
         var ret = 0
 
         if (retTurnout) {
-            ret = if (getTurnOutSelection() != defaultTurnOutSelection) {
+            ret = if (getTurnOutSelection() != rsOFFTurnOutSelection) {
                 15
             } else {
                 0
@@ -268,7 +277,13 @@ class ReceiverTurnoutTile : TileNormal(), IRTMDetectorReceiver, IRTMTurnoutRecei
         this.turnOutLeftSelectRollIDs = BitSet.valueOf(nbt.getByteArray("turnOutLeftSelectRollIDs"))
         detectorChannelKey = (nbt.getChannelKeyPair("detectorChannelKey"))
         this.turnOutSyncSelection = EnumTurnOutSwitch.getType(nbt.getInteger("turnOutSyncSelection"))
-        this.defaultTurnOutSelection = EnumTurnOutSwitch.getType(nbt.getInteger("defaultTurnOutSelection"))
+        var rsOFFSelectionID = nbt.getInteger("rsOFFTurnOutSelection")
+        val defaultSelectionID = nbt.getInteger("defaultTurnOutSelection")
+        if (rsOFFSelectionID == 0) {
+            rsOFFSelectionID = defaultSelectionID
+        }
+        this.rsOFFTurnOutSelection = EnumTurnOutSwitch.getType(rsOFFSelectionID)
+        this.defaultTurnOutSelection = EnumTurnOutSwitch.getType(defaultSelectionID)
         this.turnOutOperation = EnumTurnOutSyncSelection.getType(nbt.getInteger("turnOutOperation"))
         this._electricityAuto = nbt.getInteger("electricity")
         this.keepTurnOutSelectTime = nbt.getInteger("keepTurnOutSelectTime")
@@ -280,6 +295,7 @@ class ReceiverTurnoutTile : TileNormal(), IRTMDetectorReceiver, IRTMTurnoutRecei
         nbt.setByteArray("turnOutLeftSelectRollIDs", turnOutLeftSelectRollIDs.toByteArray())
         nbt.setChannelKeyPair("detectorChannelKey", detectorChannelKey)
         nbt.setInteger("turnOutSyncSelection", turnOutSyncSelection.id)
+        nbt.setInteger("rsOFFTurnOutSelection", rsOFFTurnOutSelection.id)
         nbt.setInteger("defaultTurnOutSelection", defaultTurnOutSelection.id)
         nbt.setInteger("turnOutOperation", turnOutOperation.id)
         nbt.setInteger("electricity", _electricityAuto)

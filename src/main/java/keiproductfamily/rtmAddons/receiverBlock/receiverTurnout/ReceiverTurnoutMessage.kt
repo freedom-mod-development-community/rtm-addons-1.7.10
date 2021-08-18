@@ -17,6 +17,7 @@ class ReceiverTurnoutMessage : TileEntityMessage, IMessageHandler<ReceiverTurnou
     var tile: ReceiverTurnoutTile by Delegates.notNull()
     var thisTurnOutChannelKeyPair: ChannelKeyPair by Delegates.notNull()
     var detectorChannelKey: ChannelKeyPair by Delegates.notNull()
+    var rsOFFTurnOutSelection: EnumTurnOutSwitch by Delegates.notNull()
     var defaultTurnOutSelection: EnumTurnOutSwitch by Delegates.notNull()
     var turnOutSelectRollIDs: BitSet by Delegates.notNull()
     var keepTurnOutSelectTime: Int by Delegates.notNull()
@@ -27,12 +28,14 @@ class ReceiverTurnoutMessage : TileEntityMessage, IMessageHandler<ReceiverTurnou
         tile: ReceiverTurnoutTile,
         thisTurnOutChannelKeyPair: ChannelKeyPair,
         detectorChannelKey: ChannelKeyPair,
+        rsOFFTurnOutSelection: EnumTurnOutSwitch,
         defaultTurnOutSelection: EnumTurnOutSwitch,
         turnOutSelectRollIDs: BitSet,
         keepTurnOutSelectTime: Int
     ) : super(tile) {
         this.thisTurnOutChannelKeyPair = thisTurnOutChannelKeyPair
         this.detectorChannelKey = detectorChannelKey
+        this.rsOFFTurnOutSelection = rsOFFTurnOutSelection
         this.defaultTurnOutSelection = defaultTurnOutSelection
         this.turnOutSelectRollIDs = turnOutSelectRollIDs
         this.keepTurnOutSelectTime = keepTurnOutSelectTime
@@ -41,6 +44,7 @@ class ReceiverTurnoutMessage : TileEntityMessage, IMessageHandler<ReceiverTurnou
     override fun read(buf: ByteBuf) {
         this.thisTurnOutChannelKeyPair = ChannelKeyPair.readFromBuf(buf)
         this.detectorChannelKey = ChannelKeyPair.readFromBuf(buf)
+        this.rsOFFTurnOutSelection = EnumTurnOutSwitch.getType(buf.readInt())
         this.defaultTurnOutSelection = EnumTurnOutSwitch.getType(buf.readInt())
         val length = buf.readInt()
         val set = IntArray(length) { buf.readInt() }
@@ -56,6 +60,7 @@ class ReceiverTurnoutMessage : TileEntityMessage, IMessageHandler<ReceiverTurnou
     override fun write(buf: ByteBuf) {
         this.thisTurnOutChannelKeyPair.writeToByteBuf(buf)
         this.detectorChannelKey.writeToByteBuf(buf)
+        buf.writeInt(this.rsOFFTurnOutSelection.id)
         buf.writeInt(this.defaultTurnOutSelection.id)
 
         //turnOutSelectRollIDs
@@ -87,6 +92,7 @@ class ReceiverTurnoutMessage : TileEntityMessage, IMessageHandler<ReceiverTurnou
             tile.thisTurnOutChannelKeyPair = message.thisTurnOutChannelKeyPair
             tile.detectorChannelKey = message.detectorChannelKey
             tile.setDatas(
+                message.rsOFFTurnOutSelection,
                 message.defaultTurnOutSelection,
                 message.turnOutSelectRollIDs,
                 message.keepTurnOutSelectTime
