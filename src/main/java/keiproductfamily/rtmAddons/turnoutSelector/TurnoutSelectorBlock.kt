@@ -22,7 +22,7 @@ class TurnoutSelectorBlock() : BlockContainer(Material.rock), IParmission {
         setCreativeTab(ModKEIProductFamily.keipfCreativeTabs)
     }
 
-    val itemBlockTurnoutSelector by lazy { Item.getItemFromBlock(ModCommonVar.turnoutSelecterBlock) }
+    val itemBlockTurnoutSelector by lazy { Item.getItemFromBlock(ModCommonVar.turnoutSelectorBlock) }
     override fun onBlockActivated(
         world: World,
         x: Int,

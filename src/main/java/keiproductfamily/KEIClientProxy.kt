@@ -4,8 +4,8 @@ import cpw.mods.fml.client.registry.ClientRegistry
 import cpw.mods.fml.client.registry.RenderingRegistry
 import keiproductfamily.rtmAddons.trainDetector.EntityTrainDetectorAdvance
 import keiproductfamily.rtmAddons.trainDetector.RenderEntityTrainDetectorAdvance
-import keiproductfamily.rtmAddons.turnoutSelecter.TurnoutSelecterRender
-import keiproductfamily.rtmAddons.turnoutSelecter.TurnoutSelecterTile
+import keiproductfamily.rtmAddons.turnoutSelector.TurnoutSelectorRender
+import keiproductfamily.rtmAddons.turnoutSelector.TurnoutSelectorTile
 
 class KEIClientProxy : KEIProxy() {
     public override fun preInit() {
@@ -16,6 +16,6 @@ class KEIClientProxy : KEIProxy() {
     }
 
     public override fun Init() {
-        ClientRegistry.bindTileEntitySpecialRenderer(TurnoutSelecterTile::class.java, TurnoutSelecterRender())
+        ClientRegistry.bindTileEntitySpecialRenderer(TurnoutSelectorTile::class.java, TurnoutSelectorRender())
     }
 }

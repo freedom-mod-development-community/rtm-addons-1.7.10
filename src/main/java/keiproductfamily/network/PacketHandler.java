@@ -9,7 +9,7 @@ import keiproductfamily.rtmAddons.RequestEntityNBTData;
 import keiproductfamily.rtmAddons.receiverBlock.receiverTrafficLights.ReceiverTrafficLightMessage;
 import keiproductfamily.rtmAddons.receiverBlock.receiverTurnout.ReceiverTurnoutMessage;
 import keiproductfamily.rtmAddons.trainDetector.MessageTrainDetectorAdvance;
-import keiproductfamily.rtmAddons.turnoutSelecter.TurnoutSelecterMessage;
+import keiproductfamily.rtmAddons.turnoutSelector.TurnoutSelectorMessage;
 
 public class PacketHandler {
     private static final SimpleNetworkWrapper INSTANCE = NetworkRegistry.INSTANCE.newSimpleChannel("KEIProductFamily");
@@ -27,8 +27,8 @@ public class PacketHandler {
         registerMessage(new RequestEntityNBTData(), RequestEntityNBTData.class, 0x04, Side.SERVER);
         registerMessage(new ReceiverTurnoutMessage(), ReceiverTurnoutMessage.class, 0x05, Side.SERVER);
         registerMessage(new ReceiverTurnoutMessage(), ReceiverTurnoutMessage.class, 0x05, Side.CLIENT);
-        registerMessage(new TurnoutSelecterMessage(), TurnoutSelecterMessage.class, 0x06, Side.SERVER);
-        registerMessage(new TurnoutSelecterMessage(), TurnoutSelecterMessage.class, 0x06, Side.CLIENT);
+        registerMessage(new TurnoutSelectorMessage(), TurnoutSelectorMessage.class, 0x06, Side.SERVER);
+        registerMessage(new TurnoutSelectorMessage(), TurnoutSelectorMessage.class, 0x06, Side.CLIENT);
     }
 
     public static <REQ extends IMessage, REPLY extends IMessage> void registerMessage(IMessageHandler<? super REQ, ? extends REPLY> messageHandler, Class<REQ> requestMessageType, int discriminator, Side sendTo) {

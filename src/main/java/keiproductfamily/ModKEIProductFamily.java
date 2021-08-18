@@ -5,6 +5,7 @@ import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
+import cpw.mods.fml.common.event.FMLMissingMappingsEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
@@ -15,14 +16,14 @@ import cpw.mods.fml.common.registry.GameRegistry;
 import keiproductfamily.PermissionList.IParmission;
 import keiproductfamily.PermissionList.PermissionCompanyList;
 import keiproductfamily.network.PacketHandler;
-import keiproductfamily.rtmAddons.receiverBlock.receiverTrafficLights.ReceiverTrafficLightBlock;
 import keiproductfamily.rtmAddons.receiverBlock.receiverTrafficLights.ReceiverTrafficLightTile;
 import keiproductfamily.rtmAddons.receiverBlock.receiverTurnout.ReceiverTurnoutTile;
 import keiproductfamily.rtmAddons.scWirelessAdvance.BlockSCWirelessAdvance;
 import keiproductfamily.rtmAddons.scWirelessAdvance.TileEntitySC_WirelessAdvance;
 import keiproductfamily.rtmAddons.trainDetector.EntityTrainDetectorAdvance;
 import keiproductfamily.rtmAddons.trainDetector.ItemTrainDetectorAdvance;
-import keiproductfamily.rtmAddons.turnoutSelecter.TurnoutSelecterTile;
+import keiproductfamily.rtmAddons.turnoutSelector.TurnoutSelectorTile;
+import kotlin.Suppress;
 import net.minecraft.block.Block;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
@@ -78,8 +79,8 @@ public class ModKEIProductFamily {
         GameRegistry.registerBlock(ModCommonVar.receiverTurnoutBlock, "ReceiverTurnoutBlock");
         GameRegistry.registerTileEntity(ReceiverTurnoutTile.class, "ReceiverTurnoutTile");
 
-        GameRegistry.registerBlock(ModCommonVar.turnoutSelecterBlock, "TurnoutSelecterBlock");
-        GameRegistry.registerTileEntity(TurnoutSelecterTile.class, "TurnoutSelecterTile");
+        GameRegistry.registerBlock(ModCommonVar.turnoutSelectorBlock, "TurnoutSelecterBlock");
+        GameRegistry.registerTileEntity(TurnoutSelectorTile.class, "TurnoutSelectorTile");
 
         ForgeChunkManager.setForcedChunkLoadingCallback(this, new ForgeChunkManager.LoadingCallback() {
             public void ticketsLoaded(List<ForgeChunkManager.Ticket> tickets, World world) {
@@ -153,5 +154,16 @@ public class ModKEIProductFamily {
     public void serverLoad(FMLServerStartingEvent event) {
         event.registerServerCommand(new CommandKEIPF());
         event.registerServerCommand(new CommandHook());
+    }
+
+
+    @Suppress(names = "UNUSED_PARAMETER")
+    @Mod.EventHandler
+    public static void FMLMissingMappingsEvent(FMLMissingMappingsEvent e) {
+        for (FMLMissingMappingsEvent.MissingMapping map : e.get()) {
+            if ("TurnoutSelecterBlock".equals(map.name)) {
+                map.remap(ModCommonVar.turnoutSelectorBlock);
+            }
+        }
     }
 }
