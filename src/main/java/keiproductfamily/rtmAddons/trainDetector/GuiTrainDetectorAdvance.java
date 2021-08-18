@@ -1,8 +1,8 @@
 package keiproductfamily.rtmAddons.trainDetector;
 
+import jp.kaiz.kaizpatch.util.KeyboardUtil;
 import jp.ngt.ngtlib.gui.GuiScreenCustom;
 import jp.ngt.ngtlib.math.NGTMath;
-import jp.ngt.ngtlib.util.KeyboardUtil;
 import keiproductfamily.network.PacketHandler;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
