@@ -281,7 +281,6 @@ class ReceiverTurnoutTile : TileNormal(), IRTMDetectorReceiver, IRTMTurnoutRecei
 
     override fun readFromNBT(nbt: NBTTagCompound) {
         super.readFromNBT(nbt)
-        thisTurnOutChannelKeyPair = nbt.getChannelKeyPair("thisTurnOutChannelKeyPair")
         this.turnOutLeftSelectRollIDs = BitSet.valueOf(nbt.getByteArray("turnOutLeftSelectRollIDs"))
         detectorChannelKey = (nbt.getChannelKeyPair("detectorChannelKey"))
         this.turnOutSyncSelection = EnumTurnOutSwitch.getType(nbt.getInteger("turnOutSyncSelection"))
@@ -295,6 +294,7 @@ class ReceiverTurnoutTile : TileNormal(), IRTMDetectorReceiver, IRTMTurnoutRecei
         this.turnOutOperation = EnumTurnOutSyncSelection.getType(nbt.getInteger("turnOutOperation"))
         this._electricityAuto = nbt.getInteger("electricity")
         this.keepTurnOutSelectTime = nbt.getInteger("keepTurnOutSelectTime")
+        thisTurnOutChannelKeyPair = nbt.getChannelKeyPair("thisTurnOutChannelKeyPair")
     }
 
     override fun writeToNBT(nbt: NBTTagCompound) {
