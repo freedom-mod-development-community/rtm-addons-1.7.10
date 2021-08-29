@@ -11,6 +11,8 @@ data class ChannelKeyPair(
     val keyString: String by lazy { toString() }
     override fun toString(): String = "$name-$number"
 
+    fun hasData(): Boolean = name != "" && number != ""
+
     fun writeToByteBuf(buf: ByteBuf): ByteBuf {
         ByteBufUtils.writeUTF8String(buf, name)
         ByteBufUtils.writeUTF8String(buf, number)

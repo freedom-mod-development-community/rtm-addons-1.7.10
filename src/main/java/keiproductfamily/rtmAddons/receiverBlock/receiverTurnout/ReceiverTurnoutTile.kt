@@ -9,6 +9,7 @@ import keiproductfamily.normal.TileNormal
 import keiproductfamily.rtmAddons.ChannelKeyPair
 import keiproductfamily.rtmAddons.EnumTurnOutSwitch
 import keiproductfamily.rtmAddons.EnumTurnOutSyncSelection
+import keiproductfamily.rtmAddons.detectorChannel.EnumDirection
 import keiproductfamily.rtmAddons.detectorChannel.IRTMDetectorReceiver
 import keiproductfamily.rtmAddons.detectorChannel.RTMDetectorChannelMaster
 import keiproductfamily.rtmAddons.turnoutChannel.IRTMTurnoutReceiver
@@ -115,20 +116,18 @@ class ReceiverTurnoutTile : TileNormal(), IRTMDetectorReceiver, IRTMTurnoutRecei
         isUpdate = true
     }
 
-    override fun validate() {
-        super.validate()
-        if (!this.worldObj.isRemote) {
-            RTMDetectorChannelMaster.reCallList(this)
-            RTMTurnoutChannelMaster.reCallList(this)
-        }
-    }
-
     fun syncNowSwitchData() {
         RTMTurnoutChannelMaster.getChannelData(thisTurnOutChannelKeyPair.keyString)
             ?.setTurnOutNowSwitchData(this.getTurnOutSelection())
     }
 
-    override fun onNewDetectorSignal(channelKey: String, signalLevel: SignalLevel, rollSignID: Byte): Boolean {
+    override fun onNewDetectorSignal(
+        channelKey: String,
+        signalLevel: SignalLevel,
+        rollSignID: Byte,
+        formationID: Long,
+        direction: EnumDirection
+    ): Boolean {
         if (this.detectorChannelKey.keyString == channelKey) {
             //error or 時間経過で方向を自動復帰し、列車が見つかっていない経過時間が設定よりたっている
             if (signalLevel == ModCommonVar.notfindTrainLevel || (rollSignID < 0 || 15 < rollSignID)) {
@@ -260,8 +259,17 @@ class ReceiverTurnoutTile : TileNormal(), IRTMDetectorReceiver, IRTMTurnoutRecei
         return ret
     }
 
+    private var initialized = false
     override fun updateEntity() {
         super.updateEntity()
+        if (!initialized) {
+            if (!this.worldObj.isRemote) {
+                RTMDetectorChannelMaster.reCallList(this)
+                RTMTurnoutChannelMaster.reCallList(this)
+            }
+            initialized = true
+        }
+
         if (receiveCnt < keepTurnOutSelectTime * 20 + 20) {
             receiveCnt++
         }

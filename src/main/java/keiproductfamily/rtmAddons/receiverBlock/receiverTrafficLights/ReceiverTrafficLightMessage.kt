@@ -11,9 +11,10 @@ import keiproductfamily.network.TileEntityMessage
 import keiproductfamily.rtmAddons.ChannelKeyPair
 import keiproductfamily.rtmAddons.EnumForcedSignalMode
 import keiproductfamily.rtmAddons.EnumTurnOutSyncSelection
+import keiproductfamily.rtmAddons.receiverBlock.receiverTraffficLightsType2.ReceiverTrafficLightMessageType2
 import kotlin.properties.Delegates
 
-class ReceiverTrafficLightMessage : TileEntityMessage, IMessageHandler<ReceiverTrafficLightMessage?, IMessage?> {
+open class ReceiverTrafficLightMessage : TileEntityMessage, IMessageHandler<ReceiverTrafficLightMessage, IMessage?> {
     var tile: ReceiverTrafficLightTile by Delegates.notNull()
     var detectorChannelKeys: Array<ChannelKeyPair> by Delegates.notNull()
     var forcedSignalSelection: EnumForcedSignalMode by Delegates.notNull()
@@ -51,7 +52,7 @@ class ReceiverTrafficLightMessage : TileEntityMessage, IMessageHandler<ReceiverT
 
     override fun write(buf: ByteBuf) {
         buf.writeInt(detectorChannelKeys.size)
-        for(pair in detectorChannelKeys) {
+        for (pair in detectorChannelKeys) {
             pair.writeToByteBuf(buf)
         }
         buf.writeInt(forcedSignalSelection.id)
@@ -61,19 +62,23 @@ class ReceiverTrafficLightMessage : TileEntityMessage, IMessageHandler<ReceiverT
     }
 
     override fun onMessage(message: ReceiverTrafficLightMessage?, ctx: MessageContext): IMessage? {
-        val tile = message?.getTileEntity(ctx)
-        if (tile is ReceiverTrafficLightTile) {
-            tile.detectorChannelKeys = message.detectorChannelKeys
-            tile.turnOutChannelKeyPair = message.turnOutChannelKeyPair
-            tile.setDatas(
-                message.forcedSignalSelection,
-                message.turnOutSyncSelection,
-                message.forceSelectSignal
-            )
-            if (ctx.side == Side.SERVER) {
-                PacketHandler.sendPacketAll(message)
+        if (message is ReceiverTrafficLightMessageType2) {
+            return ReceiverTrafficLightMessageType2.onMessage(message, ctx)
+        } else {
+            val tile = message?.getTileEntity(ctx)
+            if (tile is ReceiverTrafficLightTile) {
+                tile.detectorChannelKeys = message.detectorChannelKeys
+                tile.turnOutChannelKeyPair = message.turnOutChannelKeyPair
+                tile.setDatas(
+                    message.forcedSignalSelection,
+                    message.turnOutSyncSelection,
+                    message.forceSelectSignal
+                )
+                if (ctx.side == Side.SERVER) {
+                    PacketHandler.sendPacketAll(message)
+                }
             }
+            return null
         }
-        return null
     }
 }

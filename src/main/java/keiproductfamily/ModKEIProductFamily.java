@@ -16,6 +16,7 @@ import cpw.mods.fml.common.registry.GameRegistry;
 import keiproductfamily.PermissionList.IParmission;
 import keiproductfamily.PermissionList.PermissionCompanyList;
 import keiproductfamily.network.PacketHandler;
+import keiproductfamily.rtmAddons.receiverBlock.receiverTraffficLightsType2.ReceiverTrafficLightTileType2;
 import keiproductfamily.rtmAddons.receiverBlock.receiverTrafficLights.ReceiverTrafficLightTile;
 import keiproductfamily.rtmAddons.receiverBlock.receiverTurnout.ReceiverTurnoutTile;
 import keiproductfamily.rtmAddons.scWirelessAdvance.BlockSCWirelessAdvance;
@@ -81,6 +82,9 @@ public class ModKEIProductFamily {
 
         GameRegistry.registerBlock(ModCommonVar.turnoutSelectorBlock, "TurnoutSelecterBlock");
         GameRegistry.registerTileEntity(TurnoutSelectorTile.class, "TurnoutSelectorTile");
+
+        GameRegistry.registerBlock(ModCommonVar.receiverTrafficLightBlockType2, "ReceiverTrafficLightBlockType2");
+        GameRegistry.registerTileEntity(ReceiverTrafficLightTileType2.class, "ReceiverTrafficLightTileType2");
 
         ForgeChunkManager.setForcedChunkLoadingCallback(this, new ForgeChunkManager.LoadingCallback() {
             public void ticketsLoaded(List<ForgeChunkManager.Ticket> tickets, World world) {

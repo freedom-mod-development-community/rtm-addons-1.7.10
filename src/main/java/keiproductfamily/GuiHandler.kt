@@ -1,6 +1,8 @@
 package keiproductfamily
 
 import cpw.mods.fml.common.network.IGuiHandler
+import keiproductfamily.rtmAddons.receiverBlock.receiverTraffficLightsType2.ReceiverTrafficLightGuiType2
+import keiproductfamily.rtmAddons.receiverBlock.receiverTraffficLightsType2.ReceiverTrafficLightTileType2
 import keiproductfamily.rtmAddons.receiverBlock.receiverTrafficLights.ReceiverTrafficLightGui
 import keiproductfamily.rtmAddons.receiverBlock.receiverTrafficLights.ReceiverTrafficLightTile
 import keiproductfamily.rtmAddons.receiverBlock.receiverTurnout.ReceiverTurnoutGui
@@ -35,7 +37,13 @@ class GuiHandler : IGuiHandler {
             }
             GuiIDs.GuiID_TurnoutSelecterGui -> {
                 val tile = world.getTileEntity(x, y, z)
-                if(tile is TurnoutSelectorTile) {
+                if (tile is TurnoutSelectorTile) {
+                    return ContainerKEI()
+                }
+            }
+            GuiIDs.GuiID_ReceiverTrafficLightSettingType2 -> {
+                val tile = world.getTileEntity(x, y, z)
+                if (tile is ReceiverTrafficLightTileType2) {
                     return ContainerKEI()
                 }
             }
@@ -65,8 +73,14 @@ class GuiHandler : IGuiHandler {
             }
             GuiIDs.GuiID_TurnoutSelecterGui -> {
                 val tile = world.getTileEntity(x, y, z)
-                if(tile is TurnoutSelectorTile) {
+                if (tile is TurnoutSelectorTile) {
                     return TurnoutSelectorGui(tile)
+                }
+            }
+            GuiIDs.GuiID_ReceiverTrafficLightSettingType2 -> {
+                val tile = world.getTileEntity(x, y, z)
+                if (tile is ReceiverTrafficLightTileType2) {
+                    return ReceiverTrafficLightGuiType2(tile)
                 }
             }
         }

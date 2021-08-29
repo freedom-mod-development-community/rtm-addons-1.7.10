@@ -8,14 +8,15 @@ import keiproductfamily.rtmAddons.ChannelKeyPair
 import keiproductfamily.rtmAddons.EnumForcedSignalMode
 import keiproductfamily.rtmAddons.EnumTurnOutSwitch
 import keiproductfamily.rtmAddons.EnumTurnOutSyncSelection
+import keiproductfamily.rtmAddons.detectorChannel.EnumDirection
 import keiproductfamily.rtmAddons.detectorChannel.IRTMDetectorReceiver
 import keiproductfamily.rtmAddons.detectorChannel.RTMDetectorChannelMaster
 import keiproductfamily.rtmAddons.turnoutChannel.IRTMTurnoutReceiver
 import keiproductfamily.rtmAddons.turnoutChannel.RTMTurnoutChannelMaster
 import net.minecraft.nbt.NBTTagCompound
 
-class ReceiverTrafficLightTile : TileNormal(), IRTMDetectorReceiver, IRTMTurnoutReceiver, IProvideElectricity {
-    var detectorChannelKeys = Array(6) { ChannelKeyPair("", "") }
+open class ReceiverTrafficLightTile : TileNormal(), IRTMDetectorReceiver, IRTMTurnoutReceiver, IProvideElectricity {
+    open var detectorChannelKeys = Array(6) { ChannelKeyPair("", "") }
         set(channelKeys: Array<ChannelKeyPair>) {
             if (this.detectorChannelKeys.size == channelKeys.size) {
                 RTMDetectorChannelMaster.reSet(this, this.detectorChannelKeys, channelKeys)
@@ -52,18 +53,28 @@ class ReceiverTrafficLightTile : TileNormal(), IRTMDetectorReceiver, IRTMTurnout
         isUpdate = true
     }
 
-    override fun validate() {
-        super.validate()
-        if (!this.worldObj.isRemote) {
-            RTMDetectorChannelMaster.reCallList(this)
+    private var initialized = false
+    override fun updateEntity() {
+        super.updateEntity()
+        if(!initialized){
+            if (!this.worldObj.isRemote) {
+                RTMDetectorChannelMaster.reCallList(this)
+            }
+            initialized = true
         }
     }
 
-    override fun onNewDetectorSignal(channelKey: String, signalLevel: SignalLevel, rollSignID: Byte): Boolean {
+    override fun onNewDetectorSignal(
+        channelKey: String,
+        signalLevel: SignalLevel,
+        rollSignID: Byte,
+        formationID: Long,
+        direction: EnumDirection
+    ): Boolean {
         if (signalLevel == ModCommonVar.findTrainLevel) {
             for ((index, pair) in detectorChannelKeys.withIndex()) {
                 if (channelKey == pair.keyString) {
-                    _electricityAuto = index + 1
+                    electricityAuto = index + 1
                     return true
                 }
             }
@@ -111,15 +122,15 @@ class ReceiverTrafficLightTile : TileNormal(), IRTMDetectorReceiver, IRTMTurnout
     }
 
 
-    private var _electricityAuto: Int = 0
+    protected var electricityAuto: Int = 0
     override fun getElectricity(): Int {
         return if (forcedSignalSelection.force) {
             forceSelectSignal.level
         } else if (turnOutSyncSelection == EnumTurnOutSyncSelection.OFF) {
-            _electricityAuto
+            electricityAuto
         } else {
             if (nowTurnOutSwitch == EnumTurnOutSyncSelection.OFF || turnOutSyncSelection == nowTurnOutSwitch) {
-                _electricityAuto
+                electricityAuto
             } else {
                 SignalLevel.STOP.level
             }
@@ -135,7 +146,7 @@ class ReceiverTrafficLightTile : TileNormal(), IRTMDetectorReceiver, IRTMTurnout
         this.turnOutSyncSelection = EnumTurnOutSyncSelection.getType(nbt.getInteger("turnOutSyncSelection"))
         turnOutChannelKeyPair = nbt.getChannelKeyPair("turnOutChannnelKeyPair")
         this.forceSelectSignal = SignalLevel.getSignal(nbt.getInteger("forceSelectSignal"))
-        this._electricityAuto = nbt.getInteger("electricity")
+        this.electricityAuto = nbt.getInteger("electricity")
     }
 
     override fun writeToNBT(nbt: NBTTagCompound) {
@@ -145,6 +156,6 @@ class ReceiverTrafficLightTile : TileNormal(), IRTMDetectorReceiver, IRTMTurnout
         nbt.setInteger("turnOutSyncSelection", turnOutSyncSelection.id)
         nbt.setChannelKeyPair("turnOutChannnelKeyPair", turnOutChannelKeyPair)
         nbt.setInteger("forceSelectSignal", forceSelectSignal.level)
-        nbt.setInteger("electricity", _electricityAuto)
+        nbt.setInteger("electricity", electricityAuto)
     }
 }

@@ -7,6 +7,7 @@ item.TPRReceiveItem.name=Train Protection Radio Receiver Item
 item.TPRSendItem.name=Train Protection Radio Sender Item
 tile.TPRSendBlock.name=Train Protection Radio Sender Block
 tile.ReceiverTrafficLight.name=Receiver Block for Traffic Light
+tile.ReceiverTrafficLightType2.name=Receiver Block for Traffic Light Type2
 tile.ReceiverTurnout.name=Receiver Block for Turnout
 tile.TurnoutSelecter.name=Turnout Selecter
 

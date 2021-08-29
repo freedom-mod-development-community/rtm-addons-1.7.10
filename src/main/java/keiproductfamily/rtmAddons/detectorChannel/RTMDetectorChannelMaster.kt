@@ -2,6 +2,7 @@ package keiproductfamily.rtmAddons.detectorChannel
 
 import jp.ngt.rtm.electric.SignalLevel
 import keiproductfamily.rtmAddons.ChannelKeyPair
+import scala.util.control.Exception
 import java.util.*
 import kotlin.collections.HashSet
 import kotlin.collections.component1
@@ -55,16 +56,18 @@ object RTMDetectorChannelMaster {
     }
 
 
-    private val calledList = LinkedHashMap<String, Pair<SignalLevel, Byte>>()
+    private val calledList = LinkedHashMap<String, DataSet>()
 
-    fun putCallList(channelKey: String, signalLevel: SignalLevel, rollSignID: Byte) {
+    fun putCallList(channelKey: String, signalLevel: SignalLevel, rollSignID: Byte, formationID: Long, direction: EnumDirection) {
         calledList.remove(channelKey)
-        calledList[channelKey] = Pair(signalLevel, rollSignID)
+        calledList[channelKey] = DataSet(signalLevel, rollSignID, formationID, direction)
     }
 
     fun reCallList(receiver: IRTMDetectorReceiver) {
         for ((key, value) in calledList) {
-            receiver.onNewDetectorSignal(key, value.first, value.second)
+            receiver.onNewDetectorSignal(key, value.signalLevel, value.rollSignID, value.formationID, value.direction)
         }
     }
+
+    data class DataSet(val signalLevel: SignalLevel, val rollSignID: Byte, val formationID: Long, val direction: EnumDirection)
 }
