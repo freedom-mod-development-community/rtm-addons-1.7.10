@@ -1,6 +1,5 @@
 package keiproductfamily.rtmAddons.receiverBlock.receiverTurnout
 
-import jp.kaiz.kaizpatch.fixrtm.threadFactoryWithPrefix
 import jp.ngt.rtm.electric.IProvideElectricity
 import jp.ngt.rtm.electric.SignalLevel
 import keiproductfamily.ModCommonVar

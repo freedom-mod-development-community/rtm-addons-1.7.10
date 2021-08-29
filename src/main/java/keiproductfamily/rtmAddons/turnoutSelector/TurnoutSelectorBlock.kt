@@ -42,7 +42,9 @@ class TurnoutSelectorBlock() : BlockContainer(Material.rock), IParmission {
         } else {
             val tile = world.getTileEntity(x, y, z)
             if (tile is TurnoutSelectorTile) {
-                tile.nextTurnOutSelection()
+                if(!tile.worldObj.isRemote) {
+                    tile.nextTurnOutSelection()
+                }
                 return true
             }
             return false

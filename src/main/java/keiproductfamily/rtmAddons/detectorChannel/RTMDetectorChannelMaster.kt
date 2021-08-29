@@ -2,7 +2,6 @@ package keiproductfamily.rtmAddons.detectorChannel
 
 import jp.ngt.rtm.electric.SignalLevel
 import keiproductfamily.rtmAddons.ChannelKeyPair
-import scala.util.control.Exception
 import java.util.*
 import kotlin.collections.HashSet
 import kotlin.collections.component1

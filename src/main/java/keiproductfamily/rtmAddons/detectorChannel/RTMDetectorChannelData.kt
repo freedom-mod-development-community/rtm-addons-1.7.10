@@ -1,7 +1,6 @@
 package keiproductfamily.rtmAddons.detectorChannel
 
 import jp.ngt.rtm.electric.SignalLevel
-import keiproductfamily.ModCommonVar
 import net.minecraft.tileentity.TileEntity
 import java.util.*
 

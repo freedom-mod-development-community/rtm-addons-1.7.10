@@ -1,7 +1,8 @@
 package keiproductfamily.rtmAddons.receiverBlock.receiverTraffficLightsType2
 
 import jp.ngt.rtm.electric.SignalLevel
-import keiproductfamily.*
+import keiproductfamily.ModCommonVar
+import keiproductfamily.getChannelKeyPair
 import keiproductfamily.rtmAddons.ChannelKeyPair
 import keiproductfamily.rtmAddons.EnumForcedSignalMode
 import keiproductfamily.rtmAddons.EnumTurnOutSwitch
@@ -10,6 +11,7 @@ import keiproductfamily.rtmAddons.detectorChannel.EnumDirection
 import keiproductfamily.rtmAddons.detectorChannel.RTMDetectorChannelMaster
 import keiproductfamily.rtmAddons.receiverBlock.receiverTrafficLights.ReceiverTrafficLightTile
 import keiproductfamily.rtmAddons.turnoutChannel.RTMTurnoutChannelMaster
+import keiproductfamily.setChannelKeyPair
 import net.minecraft.nbt.NBTTagCompound
 
 class ReceiverTrafficLightTileType2 : ReceiverTrafficLightTile() {
@@ -44,6 +46,8 @@ class ReceiverTrafficLightTileType2 : ReceiverTrafficLightTile() {
         this.turnOutSyncSelection = turnOutSyncSelection
         this.turnOutSyncSelection2 = turnOutSyncSelection2
         this.forceSelectSignal = forceSelectSignal
+        RTMDetectorChannelMaster.reCallList(this)
+        RTMTurnoutChannelMaster.reCallList(this)
         this.markDirtyAndNotify()
         isUpdate = true
     }

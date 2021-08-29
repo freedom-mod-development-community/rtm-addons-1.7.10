@@ -49,6 +49,8 @@ open class ReceiverTrafficLightTile : TileNormal(), IRTMDetectorReceiver, IRTMTu
         this.forcedSignalSelection = forcedSignalSlection
         this.turnOutSyncSelection = turnOutSyncSelection
         this.forceSelectSignal = forceSelectSignal
+        RTMDetectorChannelMaster.reCallList(this)
+        RTMTurnoutChannelMaster.reCallList(this)
         this.markDirtyAndNotify()
         isUpdate = true
     }
@@ -59,6 +61,7 @@ open class ReceiverTrafficLightTile : TileNormal(), IRTMDetectorReceiver, IRTMTu
         if(!initialized){
             if (!this.worldObj.isRemote) {
                 RTMDetectorChannelMaster.reCallList(this)
+                RTMTurnoutChannelMaster.reCallList(this)
             }
             initialized = true
         }
