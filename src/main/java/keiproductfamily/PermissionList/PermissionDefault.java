@@ -77,6 +77,12 @@ class PermissionDefault {
                     " NNR\n" +
                     " KEI\n" +
                     "}\n" +
+                    "ReceiverTrafficLightType2{\n" +
+                    " Tokyu\n" +
+                    " UnEx\n" +
+                    " NNR\n" +
+                    " KEI\n" +
+                    "}\n" +
                     "";
 
     static String defaultCompany =
