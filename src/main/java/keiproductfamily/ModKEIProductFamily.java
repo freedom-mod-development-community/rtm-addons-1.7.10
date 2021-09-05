@@ -16,6 +16,7 @@ import cpw.mods.fml.common.registry.GameRegistry;
 import keiproductfamily.PermissionList.IParmission;
 import keiproductfamily.PermissionList.PermissionCompanyList;
 import keiproductfamily.network.PacketHandler;
+import keiproductfamily.rtmAddons.atc2.Atc2Gui;
 import keiproductfamily.rtmAddons.receiverBlock.receiverTraffficLightsType2.ReceiverTrafficLightTileType2;
 import keiproductfamily.rtmAddons.receiverBlock.receiverTrafficLights.ReceiverTrafficLightTile;
 import keiproductfamily.rtmAddons.receiverBlock.receiverTurnout.ReceiverTurnoutTile;
@@ -104,6 +105,7 @@ public class ModKEIProductFamily {
 
         FMLCommonHandler.instance().bus().register(this);
         MinecraftForge.EVENT_BUS.register(this);
+        MinecraftForge.EVENT_BUS.register(Atc2Gui.INSTANCE);
         PacketHandler.init();
         proxy.preInit();
     }
