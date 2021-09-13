@@ -28,6 +28,7 @@ class ReceiverTrafficLightMessageType2 : ReceiverTrafficLightMessage {
         turnOutSyncSelection2: EnumTurnOutSyncSelection,
         turnOutChannelKey: ChannelKeyPair,
         turnOutChannelKey2: ChannelKeyPair,
+        signalChannelKey: ChannelKeyPair,
         forceSelectSignal: SignalLevel
     ) : super(
         tile,
@@ -35,6 +36,7 @@ class ReceiverTrafficLightMessageType2 : ReceiverTrafficLightMessage {
         forcedSignalSelection,
         turnOutSyncSelection,
         turnOutChannelKey,
+        signalChannelKey,
         forceSelectSignal
     ) {
         this.turnOutSyncSelection2 = turnOutSyncSelection2
@@ -57,6 +59,7 @@ class ReceiverTrafficLightMessageType2 : ReceiverTrafficLightMessage {
         override fun onMessage(message: ReceiverTrafficLightMessageType2, ctx: MessageContext): IMessage? {
             val tile = message.getTileEntity(ctx)
             if (tile is ReceiverTrafficLightTileType2) {
+                tile.signalChannelKeysPair = message.signalChannelKeysPair
                 tile.detectorChannelKeys = message.detectorChannelKeys
                 tile.turnOutChannelKeyPair = message.turnOutChannelKeyPair
                 tile.turnOutChannelKeyPair2 = message.turnOutChannelKeyPair2

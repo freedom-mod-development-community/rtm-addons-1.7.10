@@ -15,10 +15,18 @@ object RTMTurnoutChannelMaster {
         return channelDATAs[channelName]
     }
 
-    fun reSet(receiver: IRTMTurnoutReceiver, from: ChannelKeyPair, to: ChannelKeyPair) {
+    fun reSet(receiver: IRTMTurnoutReceiver, from: ChannelKeyPair?, to: ChannelKeyPair?) {
         if (!receiver.isRemote()) {
-            val fromSet = setOf(from.keyString)
-            val toSet = setOf(to.keyString)
+            val fromSet = if (from != null) {
+                setOf(from.keyString)
+            } else {
+                HashSet()
+            }
+            val toSet = if (to != null) {
+                setOf(to.keyString)
+            } else {
+                HashSet()
+            }
             val remove = HashSet(fromSet)
             remove.removeAll(toSet)
             val add = HashSet(toSet)
@@ -41,11 +49,12 @@ object RTMTurnoutChannelMaster {
     private val forceSelectCalledList = LinkedHashMap<String, EnumTurnOutSyncSelection>()
     private val nowSwitchCalledList = LinkedHashMap<String, EnumTurnOutSwitch>()
 
-    fun putForceSelectCallList(channelKey: String, forceSelect: EnumTurnOutSyncSelection){
+    fun putForceSelectCallList(channelKey: String, forceSelect: EnumTurnOutSyncSelection) {
         forceSelectCalledList.remove(channelKey)
         forceSelectCalledList[channelKey] = forceSelect
     }
-    fun putNowSelectCallList(channelKey: String, turnoutSide: EnumTurnOutSwitch){
+
+    fun putNowSelectCallList(channelKey: String, turnoutSide: EnumTurnOutSwitch) {
         nowSwitchCalledList.remove(channelKey)
         nowSwitchCalledList[channelKey] = turnoutSide
     }

@@ -1,12 +1,16 @@
 package keiproductfamily
 
 import cpw.mods.fml.common.network.IGuiHandler
+import keiproductfamily.rtmAddons.atc2.transmitter.ATC2TransmitterEntity
+import keiproductfamily.rtmAddons.atc2.transmitter.ATC2TransmitterGui
 import keiproductfamily.rtmAddons.receiverBlock.receiverTraffficLightsType2.ReceiverTrafficLightGuiType2
 import keiproductfamily.rtmAddons.receiverBlock.receiverTraffficLightsType2.ReceiverTrafficLightTileType2
 import keiproductfamily.rtmAddons.receiverBlock.receiverTrafficLights.ReceiverTrafficLightGui
 import keiproductfamily.rtmAddons.receiverBlock.receiverTrafficLights.ReceiverTrafficLightTile
 import keiproductfamily.rtmAddons.receiverBlock.receiverTurnout.ReceiverTurnoutGui
 import keiproductfamily.rtmAddons.receiverBlock.receiverTurnout.ReceiverTurnoutTile
+import keiproductfamily.rtmAddons.tablet.ItemRTMTablet
+import keiproductfamily.rtmAddons.tablet.RTMTabletGui
 import keiproductfamily.rtmAddons.trainDetector.EntityTrainDetectorAdvance
 import keiproductfamily.rtmAddons.trainDetector.GuiTrainDetectorAdvance
 import keiproductfamily.rtmAddons.turnoutSelector.TurnoutSelectorGui
@@ -47,6 +51,17 @@ class GuiHandler : IGuiHandler {
                     return ContainerKEI()
                 }
             }
+            GuiIDs.GuiID_ATC2TransmitterEntitySetting -> {
+                val entity = world.getEntityByID(x)
+                if (entity is ATC2TransmitterEntity) {
+                    return ContainerKEI()
+                }
+            }
+            GuiIDs.GuiID_RTMTablet -> {
+                if (player.heldItem?.item is ItemRTMTablet) {
+                    return ContainerKEI()
+                }
+            }
         }
         return null
     }
@@ -81,6 +96,18 @@ class GuiHandler : IGuiHandler {
                 val tile = world.getTileEntity(x, y, z)
                 if (tile is ReceiverTrafficLightTileType2) {
                     return ReceiverTrafficLightGuiType2(tile)
+                }
+            }
+            GuiIDs.GuiID_ATC2TransmitterEntitySetting -> {
+                val entity = world.getEntityByID(x)
+                if (entity is ATC2TransmitterEntity) {
+                    return ATC2TransmitterGui(entity)
+                }
+            }
+            GuiIDs.GuiID_RTMTablet -> {
+                if (player.heldItem?.item is ItemRTMTablet) {
+                    val formationID = (x.toLong() shl 42) + (y.toLong() shl 21) + z.toLong()
+                    return RTMTabletGui(player, formationID)
                 }
             }
         }

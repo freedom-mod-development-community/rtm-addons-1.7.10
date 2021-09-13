@@ -25,7 +25,7 @@ public class ItemTrainDetectorAdvance  extends ItemWithModel {
     public ItemTrainDetectorAdvance() {
         this.setHasSubtypes(true);
         setUnlocalizedName("itemTrainDetectorAdvance");
-        setTextureName("rtm:installedObject");
+        setTextureName(ModKEIProductFamily.DOMAIN + ":itemTrainDetectorAdvance");
         setCreativeTab(ModKEIProductFamily.keipfCreativeTabs);
     }
 
@@ -97,7 +97,7 @@ public class ItemTrainDetectorAdvance  extends ItemWithModel {
 
     @SideOnly(Side.CLIENT)
     public void registerIcons(IIconRegister register) {
-        this.icon = register.registerIcon("rtm:itemTrainDetector");
+        this.icon = register.registerIcon(ModKEIProductFamily.DOMAIN + ":itemTrainDetectorAdvance");
     }
 
     protected String getModelType(ItemStack itemStack) {

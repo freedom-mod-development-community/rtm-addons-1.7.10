@@ -5,7 +5,10 @@ import keiproductfamily.rtmAddons.ChannelKeyPair
 
 object RTMSignalChannelMaster {
     private val channelDatas = HashMap<String, RTMSignalChannelData>()
-    fun getChannelData(channelName: String): RTMSignalChannelData? {
+    fun getOrMakeChannelData(channelName: String): RTMSignalChannelData? {
+        if (channelDatas[channelName] == null) {
+            channelDatas[channelName] = RTMSignalChannelData(channelName)
+        }
         return channelDatas[channelName]
     }
 
@@ -15,10 +18,8 @@ object RTMSignalChannelMaster {
         }
     }
 
-    private fun reSet(receiver: IRTMSignalChannelReceiver, from: ChannelKeyPair, to: ChannelKeyPair) {
+    fun reSet(receiver: IRTMSignalChannelReceiver, fromSet: Set<String>, toSet: Set<String>) {
         if (!receiver.isRemote()) {
-            val fromSet = setOf(from.keyString)
-            val toSet = setOf(to.keyString)
             val remove = HashSet(fromSet)
             remove.removeAll(toSet)
             val add = HashSet(toSet)
@@ -39,13 +40,15 @@ object RTMSignalChannelMaster {
 
     private val calledList = LinkedHashMap<String, SignalLevel>()
 
-    fun putCallList(channelName: String, signalLevel: SignalLevel){
-        calledList.remove(channelName)
-        calledList[channelName] = signalLevel
+    fun putCallList(channelName: String, signalLevel: SignalLevel) {
+        if (channelName != "" && channelName != "-") {
+            calledList.remove(channelName)
+            calledList[channelName] = signalLevel
+        }
     }
 
-    fun reCallList(receiver: IRTMSignalChannelReceiver){
-        for((channelName, signalLevel) in calledList){
+    fun reCallList(receiver: IRTMSignalChannelReceiver) {
+        for ((channelName, signalLevel) in calledList) {
             receiver.onNewLevelSignal(channelName, signalLevel)
         }
     }

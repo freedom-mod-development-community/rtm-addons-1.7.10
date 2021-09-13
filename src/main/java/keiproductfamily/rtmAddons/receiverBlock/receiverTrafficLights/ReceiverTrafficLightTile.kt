@@ -11,11 +11,13 @@ import keiproductfamily.rtmAddons.EnumTurnOutSyncSelection
 import keiproductfamily.rtmAddons.detectorChannel.EnumDirection
 import keiproductfamily.rtmAddons.detectorChannel.IRTMDetectorReceiver
 import keiproductfamily.rtmAddons.detectorChannel.RTMDetectorChannelMaster
+import keiproductfamily.rtmAddons.signalchannel.RTMSignalChannelMaster
 import keiproductfamily.rtmAddons.turnoutChannel.IRTMTurnoutReceiver
 import keiproductfamily.rtmAddons.turnoutChannel.RTMTurnoutChannelMaster
 import net.minecraft.nbt.NBTTagCompound
 
 open class ReceiverTrafficLightTile : TileNormal(), IRTMDetectorReceiver, IRTMTurnoutReceiver, IProvideElectricity {
+    open var signalChannelKeysPair = ChannelKeyPair("", "")
     open var detectorChannelKeys = Array(6) { ChannelKeyPair("", "") }
         set(channelKeys: Array<ChannelKeyPair>) {
             if (this.detectorChannelKeys.size == channelKeys.size) {
@@ -51,6 +53,7 @@ open class ReceiverTrafficLightTile : TileNormal(), IRTMDetectorReceiver, IRTMTu
         this.forceSelectSignal = forceSelectSignal
         RTMDetectorChannelMaster.reCallList(this)
         RTMTurnoutChannelMaster.reCallList(this)
+        shareAndPutCallList()
         this.markDirtyAndNotify()
         isUpdate = true
     }
@@ -58,8 +61,9 @@ open class ReceiverTrafficLightTile : TileNormal(), IRTMDetectorReceiver, IRTMTu
     private var initialized = false
     override fun updateEntity() {
         super.updateEntity()
-        if(!initialized){
+        if (!initialized) {
             if (!this.worldObj.isRemote) {
+                shareAndPutCallList()
                 RTMDetectorChannelMaster.reCallList(this)
                 RTMTurnoutChannelMaster.reCallList(this)
             }
@@ -78,6 +82,7 @@ open class ReceiverTrafficLightTile : TileNormal(), IRTMDetectorReceiver, IRTMTu
             for ((index, pair) in detectorChannelKeys.withIndex()) {
                 if (channelKey == pair.keyString) {
                     electricityAuto = index + 1
+                    shareAndPutCallList()
                     return true
                 }
             }
@@ -90,6 +95,7 @@ open class ReceiverTrafficLightTile : TileNormal(), IRTMDetectorReceiver, IRTMTu
             val newValue = nowSide.toEnumTurnOutSyncSelection()
             if (nowTurnOutSwitch != newValue) {
                 nowTurnOutSwitch = newValue
+                shareAndPutCallList()
                 changeNotify()
             }
             return true
@@ -142,18 +148,31 @@ open class ReceiverTrafficLightTile : TileNormal(), IRTMDetectorReceiver, IRTMTu
 
     override fun setElectricity(x: Int, y: Int, z: Int, level: Int) {}
 
+
+    fun shareAndPutCallList() {
+        if (worldObj != null && !worldObj.isRemote) {
+            val signalLevel = SignalLevel.getSignal(electricity)
+            RTMSignalChannelMaster.getOrMakeChannelData(this.signalChannelKeysPair.keyString)
+                ?.setSignalLevelNowData(signalLevel)
+            RTMSignalChannelMaster.putCallList(this.signalChannelKeysPair.keyString, signalLevel)
+        }
+    }
+
     override fun readFromNBT(nbt: NBTTagCompound) {
         super.readFromNBT(nbt)
+        signalChannelKeysPair = nbt.getChannelKeyPair("signalChannelKeysPair")
         detectorChannelKeys = nbt.getChannelKeyPairArray("detectorChannelKeys")
         this.forcedSignalSelection = EnumForcedSignalMode.getType(nbt.getInteger("forcedSignalSlection"))
         this.turnOutSyncSelection = EnumTurnOutSyncSelection.getType(nbt.getInteger("turnOutSyncSelection"))
         turnOutChannelKeyPair = nbt.getChannelKeyPair("turnOutChannnelKeyPair")
         this.forceSelectSignal = SignalLevel.getSignal(nbt.getInteger("forceSelectSignal"))
         this.electricityAuto = nbt.getInteger("electricity")
+        shareAndPutCallList()
     }
 
     override fun writeToNBT(nbt: NBTTagCompound) {
         super.writeToNBT(nbt)
+        nbt.setChannelKeyPair("signalChannelKeysPair", signalChannelKeysPair)
         nbt.setChannelKeyPairArray("detectorChannelKeys", detectorChannelKeys)
         nbt.setInteger("forcedSignalSlection", forcedSignalSelection.id)
         nbt.setInteger("turnOutSyncSelection", turnOutSyncSelection.id)

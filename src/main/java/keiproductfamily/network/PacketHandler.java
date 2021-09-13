@@ -6,11 +6,15 @@ import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
 import cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import cpw.mods.fml.relauncher.Side;
 import keiproductfamily.rtmAddons.RequestEntityNBTData;
+import keiproductfamily.rtmAddons.atc2.ATC2SignalSendMessage;
+import keiproductfamily.rtmAddons.atc2.transmitter.ATC2TransmitterMessage;
+import keiproductfamily.rtmAddons.formationNumber.FormationNumberMessage;
 import keiproductfamily.rtmAddons.receiverBlock.receiverTraffficLightsType2.ReceiverTrafficLightMessageType2;
 import keiproductfamily.rtmAddons.receiverBlock.receiverTrafficLights.ReceiverTrafficLightMessage;
 import keiproductfamily.rtmAddons.receiverBlock.receiverTurnout.ReceiverTurnoutMessage;
 import keiproductfamily.rtmAddons.trainDetector.MessageTrainDetectorAdvance;
 import keiproductfamily.rtmAddons.turnoutSelector.TurnoutSelectorMessage;
+import net.minecraft.entity.player.EntityPlayerMP;
 
 public class PacketHandler {
     private static final SimpleNetworkWrapper INSTANCE = NetworkRegistry.INSTANCE.newSimpleChannel("KEIProductFamily");
@@ -32,7 +36,12 @@ public class PacketHandler {
         registerMessage(new TurnoutSelectorMessage(), TurnoutSelectorMessage.class, 0x06, Side.CLIENT);
         registerMessage(ReceiverTrafficLightMessageType2.Companion, ReceiverTrafficLightMessageType2.class, 0x07, Side.SERVER);
         registerMessage(ReceiverTrafficLightMessageType2.Companion, ReceiverTrafficLightMessageType2.class, 0x07, Side.CLIENT);
-
+        registerMessage(new ATC2TransmitterMessage(), ATC2TransmitterMessage.class, 0x08, Side.SERVER);
+        registerMessage(new ATC2TransmitterMessage(), ATC2TransmitterMessage.class, 0x08, Side.CLIENT);
+        registerMessage(ATC2SignalSendMessage.Companion, ATC2SignalSendMessage.class, 0x09, Side.SERVER);
+        registerMessage(ATC2SignalSendMessage.Companion, ATC2SignalSendMessage.class, 0x09, Side.CLIENT);
+        registerMessage(FormationNumberMessage.Companion, FormationNumberMessage.class, 0x0a, Side.SERVER);
+        registerMessage(FormationNumberMessage.Companion, FormationNumberMessage.class, 0x0a, Side.CLIENT);
     }
 
     public static <REQ extends IMessage, REPLY extends IMessage> void registerMessage(IMessageHandler<? super REQ, ? extends REPLY> messageHandler, Class<REQ> requestMessageType, int discriminator, Side sendTo) {
@@ -45,5 +54,9 @@ public class PacketHandler {
 
     public static void sendPacketAll(IMessage message) {
         INSTANCE.sendToAll(message);
+    }
+
+    public static void sendPacketEPM(IMessage message, EntityPlayerMP EPM) {
+        INSTANCE.sendTo(message, EPM);
     }
 }
