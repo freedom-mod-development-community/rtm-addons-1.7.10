@@ -1,15 +1,9 @@
 package keiproductfamily.rtmAddons.atc2.transmitter
 
-import jp.ngt.ngtlib.network.PacketNBT
-import jp.ngt.rtm.entity.EntityInstalledObject
 import jp.ngt.rtm.entity.train.EntityBogie
 import jp.ngt.rtm.entity.train.EntityTrainBase
 import jp.ngt.rtm.entity.train.parts.EntityFloor
 import jp.ngt.rtm.item.ItemWire
-import jp.ngt.rtm.modelpack.cfg.MachineConfig
-import jp.ngt.rtm.modelpack.cfg.ModelConfig
-import jp.ngt.rtm.modelpack.modelset.ModelSetMachine
-import jp.ngt.rtm.modelpack.modelset.ModelSetMachineClient
 import keiproductfamily.GuiIDs
 import keiproductfamily.ModKEIProductFamily
 import keiproductfamily.PermissionList.IParmission
@@ -20,27 +14,30 @@ import keiproductfamily.rtmAddons.RequestEntityNBTData
 import keiproductfamily.rtmAddons.atc2.ATC2Core
 import keiproductfamily.rtmAddons.detectorChannel.EnumDirection
 import keiproductfamily.rtmAddons.formationNumber.FormationNumberCore
-import keiproductfamily.rtmAddons.formationNumber.FormationNumberKeyPair
 import keiproductfamily.rtmAddons.signalchannel.RTMSignalChannelMaster
 import keiproductfamily.setChannelKeyPair
+import net.minecraft.entity.Entity
 import net.minecraft.entity.player.EntityPlayer
+import net.minecraft.init.Blocks
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.AxisAlignedBB
+import net.minecraft.util.DamageSource
+import net.minecraft.util.MovingObjectPosition
 import net.minecraft.world.World
 import kotlin.math.abs
 import kotlin.math.atan2
 import kotlin.math.min
 
-class ATC2TransmitterEntity(world: World?) : EntityInstalledObject(world), IParmission {
+class ATC2TransmitterEntity(world: World) : Entity(world), IParmission {
     private var findTrain = false
     var signalChannelKeyPairL: ChannelKeyPair = ChannelKeyPair("", "")
     var turnOutChannelKeyPair: ChannelKeyPair = ChannelKeyPair("", "")
     var signalChannelKeyPairR: ChannelKeyPair = ChannelKeyPair("", "")
     var subjectFormationRegex: String = ""
 
-    override fun entityInit() {
-        super.entityInit()
+    override fun shouldRenderInPass(pass: Int): Boolean {
+        return pass >= 0
     }
 
     override fun setEntityId(p_145769_1_: Int) {
@@ -50,8 +47,10 @@ class ATC2TransmitterEntity(world: World?) : EntityInstalledObject(world), IParm
         }
     }
 
+    override fun entityInit() {
+    }
+
     public override fun writeEntityToNBT(nbt: NBTTagCompound) {
-        super.writeEntityToNBT(nbt)
         nbt.setChannelKeyPair("signalChannelKeyPairL", signalChannelKeyPairL)
         nbt.setChannelKeyPair("turnOutChannelKeyPair", turnOutChannelKeyPair)
         nbt.setChannelKeyPair("signalChannelKeyPairR", signalChannelKeyPairR)
@@ -65,8 +64,17 @@ class ATC2TransmitterEntity(world: World?) : EntityInstalledObject(world), IParm
         subjectFormationRegex = nbt.getString("subjectFormationRegex")
     }
 
-    val signalChannelKeyL: String
-        get() = signalChannelKeyPairL.keyString
+    override fun canBePushed(): Boolean {
+        return false
+    }
+
+    override fun canBeCollidedWith(): Boolean {
+        return !isDead
+    }
+
+    override fun canTriggerWalking(): Boolean {
+        return false
+    }
 
     fun setSignalChannelNameL(channelKey: ChannelKeyPair) {
         val name = channelKey.name.trim { it <= ' ' }
@@ -79,9 +87,6 @@ class ATC2TransmitterEntity(world: World?) : EntityInstalledObject(world), IParm
         }
     }
 
-    val signalChannelKeyR: String
-        get() = signalChannelKeyPairR.keyString
-
     fun setSignalChannelNameR(channelKey: ChannelKeyPair) {
         val name = channelKey.name.trim { it <= ' ' }
         val number = channelKey.number.trim { it <= ' ' }
@@ -92,9 +97,6 @@ class ATC2TransmitterEntity(world: World?) : EntityInstalledObject(world), IParm
             }
         }
     }
-
-    val turnOutChannelKey: String
-        get() = turnOutChannelKeyPair.keyString
 
     fun setTurnOutChannelName(channelKey: ChannelKeyPair) {
         val name = channelKey.name.trim { it <= ' ' }
@@ -206,6 +208,42 @@ class ATC2TransmitterEntity(world: World?) : EntityInstalledObject(world), IParm
         return Pair(null, EnumDirection.Null)
     }
 
+    override fun attackEntityFrom(par1: DamageSource, par2: Float): Boolean {
+        return if (this.isEntityInvulnerable || isDead) {
+            false
+        } else {
+            if (par1.entity is EntityPlayer) {
+                if (!worldObj.isRemote) {
+                    setBeenAttacked()
+                    val entityplayer = par1.entity as EntityPlayer
+                    if (!entityplayer.capabilities.isCreativeMode) {
+                        dropItems()
+                    }
+                    val block = Blocks.stone
+                    worldObj.playSoundEffect(
+                        posX,
+                        posY,
+                        posZ,
+                        block.stepSound.func_150496_b(),
+                        (block.stepSound.getVolume() + 1.0f) / 2.0f,
+                        block.stepSound.pitch * 0.8f
+                    )
+                    setDead()
+                }
+                return true
+            }
+            false
+        }
+    }
+
+    fun dropItems() {
+        entityDropItem(ItemStack(ModKEIProductFamily.itemATC2Transmitter), 0.0f)
+    }
+
+    override fun moveEntity(par1: Double, par3: Double, par5: Double) {}
+
+    override fun addVelocity(par1: Double, par3: Double, par5: Double) {}
+
     override fun interactFirst(player: EntityPlayer): Boolean {
         if (player.heldItem == null || player.heldItem.item !is ItemWire) {
             if (worldObj.isRemote) {
@@ -219,41 +257,11 @@ class ATC2TransmitterEntity(world: World?) : EntityInstalledObject(world), IParm
         return super.interactFirst(player)
     }
 
-    override fun dropItems() {
-        entityDropItem(ItemStack(ModKEIProductFamily.itemATC2Transmitter), 0.0f)
+    override fun getPickedResult(target: MovingObjectPosition?): ItemStack? {
+        return getItem()
     }
 
-    private var myModelSet: ModelSetMachine? = null
-    override fun getModelSet(): ModelSetMachine? {
-        if (myModelSet == null || myModelSet!!.isDummy) {
-            val machineConfig = MachineConfig()
-            val model = ModelConfig.ModelSource()
-            model.modelFile = "ATC02.mqo"
-            model.textures = arrayOf(arrayOf("default", "textures/atc2.png", ""))
-            machineConfig.model = model
-            machineConfig.buttonTexture = "textures/button_ATC_02k.png"
-            machineConfig.machineType = "Antenna_Receive"
-            machineConfig.tags = "kuma_ya"
-            machineConfig.doCulling = true
-            machineConfig.accuracy = "LOW"
-            myModelSet = ModelSetMachineClient(machineConfig)
-
-            if (worldObj == null || !worldObj.isRemote) {
-                PacketNBT.sendToClient(this)
-            }
-        }
-        return myModelSet
-    }
-
-    override fun getSubType(): String {
-        return "Antenna_Receive"
-    }
-
-    override fun getDefaultName(): String {
-        return "TrainDetector_01"
-    }
-
-    override fun getItem(): ItemStack {
+    private fun getItem(): ItemStack {
         return ItemStack(ModKEIProductFamily.itemATC2Transmitter)
     }
 

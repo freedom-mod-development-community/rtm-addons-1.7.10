@@ -8,17 +8,19 @@ import jp.ngt.rtm.item.ItemWithModel;
 import jp.ngt.rtm.rail.TileEntityLargeRailBase;
 import jp.ngt.rtm.rail.util.RailMap;
 import keiproductfamily.ModKEIProductFamily;
+import keiproductfamily.PermissionList.IParmission;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 
 
-public class ItemTrainDetectorAdvance  extends ItemWithModel {
+public class ItemTrainDetectorAdvance extends Item implements IParmission {
     @SideOnly(Side.CLIENT)
     private IIcon icon;
 
@@ -63,7 +65,7 @@ public class ItemTrainDetectorAdvance  extends ItemWithModel {
         return true;
     }
 
-    public boolean setEntityOnRail(World world, EntityInstalledObject entity, int x, int y, int z, EntityPlayer player, ItemStack stack) {
+    public boolean setEntityOnRail(World world, EntityTrainDetectorAdvance entity, int x, int y, int z, EntityPlayer player, ItemStack stack) {
         RailMap rm0 = TileEntityLargeRailBase.getRailMapFromCoordinates(world, null, x, y, z);
         if (rm0 == null) {
             return false;
@@ -84,8 +86,8 @@ public class ItemTrainDetectorAdvance  extends ItemWithModel {
             entity.rotationYaw = yaw;
             entity.rotationPitch = 0.0F;
             world.spawnEntityInWorld(entity);
-            entity.setModelName(this.getModelName(stack));
-            entity.getResourceState().readFromNBT(this.getModelState(stack).writeToNBT());
+//            entity.setModelName(this.getModelName(stack));
+//            entity.getResourceState().readFromNBT(this.getModelState(stack).writeToNBT());
             return true;
         }
     }
@@ -100,15 +102,8 @@ public class ItemTrainDetectorAdvance  extends ItemWithModel {
         this.icon = register.registerIcon(ModKEIProductFamily.DOMAIN + ":itemTrainDetectorAdvance");
     }
 
-    protected String getModelType(ItemStack itemStack) {
-        return "ModelMachine";
-    }
-
-    protected String getDefaultModelName(ItemStack itemStack) {
-        return "TrainDetector_01";
-    }
-
-    public String getSubType(ItemStack itemStack) {
-        return MachineType.Antenna_Receive.toString();
+    @Override
+    public String getName() {
+        return "TrainDetectorAdvance";
     }
 }

@@ -8,7 +8,14 @@ data class ChannelKeyPair(
     val name: String = "",
     val number: String = ""
 ) {
-    val keyString: String by lazy { toString() }
+    val keyString: String by lazy {
+        if (hasData()) {
+            toString()
+        } else {
+            ""
+        }
+    }
+
     override fun toString(): String = "$name-$number"
 
     fun hasData(): Boolean = name != "" && number != ""
@@ -24,15 +31,17 @@ data class ChannelKeyPair(
     }
 
     override fun equals(other: Any?): Boolean {
-        if(this === other){return true}
-        return if(other is ChannelKeyPair){
+        if (this === other) {
+            return true
+        }
+        return if (other is ChannelKeyPair) {
             this.name == other.name && this.number == other.number
-        }else{
+        } else {
             false
         }
     }
 
-    override fun hashCode(): Int{
+    override fun hashCode(): Int {
         return name.hashCode() + number.hashCode()
     }
 

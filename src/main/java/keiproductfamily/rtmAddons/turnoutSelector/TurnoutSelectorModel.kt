@@ -26,11 +26,12 @@ class TurnoutSelectorModel : ModelBase() {
         GL11.glPushMatrix()
         GL11.glTranslated(x + 0.5, y, z + 0.5)
         GL11.glRotated(tile.getDirectionalAng(), 0.0, 1.0, 0.0)
-        FMLClientHandler.instance().client.renderEngine.bindTexture(this.textureblackMetalic)
+        val renderEngine = FMLClientHandler.instance().client.renderEngine
+        renderEngine.bindTexture(this.textureblackMetalic)
         this.model.renderPart("base")
-        FMLClientHandler.instance().client.renderEngine.bindTexture(this.texturesilcerMetalic)
+        renderEngine.bindTexture(this.texturesilcerMetalic)
         this.model.renderPart("basesilver")
-        FMLClientHandler.instance().client.renderEngine.bindTexture(this.textureblackMetalic)
+        renderEngine.bindTexture(this.textureblackMetalic)
         GL11.glTranslated(0.0, 0.32, 0.0)
         val ang = when(tile.turnOutSelection){
             EnumTurnOutSyncSelection.Left -> 45.0
@@ -39,7 +40,7 @@ class TurnoutSelectorModel : ModelBase() {
         }
         GL11.glRotated(ang, 0.0, 0.0, 1.0)
         this.model.renderPart("hand")
-        FMLClientHandler.instance().client.renderEngine.bindTexture(this.texturesilcerMetalic)
+        renderEngine.bindTexture(this.texturesilcerMetalic)
         this.model.renderPart("handsilver")
         GL11.glPopMatrix()
     }

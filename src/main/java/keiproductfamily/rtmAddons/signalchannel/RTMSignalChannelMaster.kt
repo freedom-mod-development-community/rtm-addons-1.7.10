@@ -5,11 +5,16 @@ import keiproductfamily.rtmAddons.ChannelKeyPair
 
 object RTMSignalChannelMaster {
     private val channelDatas = HashMap<String, RTMSignalChannelData>()
-    fun getOrMakeChannelData(channelName: String): RTMSignalChannelData? {
-        if (channelDatas[channelName] == null) {
-            channelDatas[channelName] = RTMSignalChannelData(channelName)
+    fun getOrMakeChannelData(channelKey: ChannelKeyPair): RTMSignalChannelData? {
+        return if (channelKey.hasData()) {
+            val channelName = channelKey.keyString
+            if (channelDatas[channelName] == null) {
+                channelDatas[channelName] = RTMSignalChannelData(channelName)
+            }
+            channelDatas[channelName]
+        } else {
+            null
         }
-        return channelDatas[channelName]
     }
 
     fun makeChannel(channelKey: ChannelKeyPair) {

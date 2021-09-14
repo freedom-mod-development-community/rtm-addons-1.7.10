@@ -12,12 +12,14 @@ import net.minecraft.block.Block
 import net.minecraft.client.renderer.texture.IIconRegister
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.init.Blocks
+import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import net.minecraft.util.IIcon
 import net.minecraft.util.MathHelper
 import net.minecraft.world.World
+import kotlin.math.abs
 
-class ATC2TransmitterItem : ItemWithModel(), IParmission {
+class ATC2TransmitterItem : Item(), IParmission {
     @SideOnly(Side.CLIENT)
     private var icon: IIcon? = null
 
@@ -90,7 +92,7 @@ class ATC2TransmitterItem : ItemWithModel(), IParmission {
 
     fun setEntityOnRail(
         world: World,
-        entity: EntityInstalledObject,
+        entity: ATC2TransmitterEntity,
         x: Int,
         y: Int,
         z: Int,
@@ -110,15 +112,13 @@ class ATC2TransmitterItem : ItemWithModel(), IParmission {
             var yaw = rm0.getRailRotation(split, i0)
             val yaw2 = -player.rotationYaw + 180.0f
             val dif = MathHelper.wrapAngleTo180_float(yaw - yaw2)
-            if (Math.abs(dif) > 90.0f) {
+            if (abs(dif) > 90.0f) {
                 yaw += 180.0f
             }
             entity.setPosition(posX, posY, posZ)
             entity.rotationYaw = yaw
             entity.rotationPitch = 0.0f
             world.spawnEntityInWorld(entity)
-            entity.modelName = this.getModelName(stack)
-            entity.resourceState.readFromNBT(getModelState(stack).writeToNBT())
             true
         }
     }
@@ -131,18 +131,6 @@ class ATC2TransmitterItem : ItemWithModel(), IParmission {
     @SideOnly(Side.CLIENT)
     override fun registerIcons(register: IIconRegister) {
         icon = register.registerIcon(ModKEIProductFamily.DOMAIN + ":itemATC2")
-    }
-
-    override fun getModelType(itemStack: ItemStack?): String {
-        return "ModelMachine"
-    }
-
-    override fun getDefaultModelName(itemStack: ItemStack?): String {
-        return "TrainDetector_01"
-    }
-
-    override fun getSubType(itemStack: ItemStack?): String {
-        return MachineType.Antenna_Receive.toString()
     }
 
     override fun getName(): String {

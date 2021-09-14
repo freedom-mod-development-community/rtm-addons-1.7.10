@@ -1,21 +1,37 @@
 package keiproductfamily.rtmAddons.atc2.transmitter
 
+import cpw.mods.fml.client.FMLClientHandler
+import jp.ngt.ngtlib.renderer.model.IModelNGT
 import jp.ngt.rtm.entity.EntityInstalledObject
+import jp.ngt.rtm.modelpack.ModelPackManager
+import jp.ngt.rtm.modelpack.cfg.MachineConfig
+import jp.ngt.rtm.modelpack.cfg.ModelConfig
 import jp.ngt.rtm.modelpack.modelset.ModelSetMachineClient
+import jp.ngt.rtm.render.ModelObject
+import jp.ngt.rtm.render.PartsRenderer
+import keiproductfamily.ModKEIProductFamily
 import net.minecraft.client.renderer.entity.Render
+import net.minecraft.client.renderer.texture.TextureManager
 import net.minecraft.entity.Entity
 import net.minecraft.util.ResourceLocation
 import net.minecraftforge.client.MinecraftForgeClient
+import net.minecraftforge.client.model.AdvancedModelLoader
+import net.minecraftforge.client.model.IModelCustom
 import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.GL12
 
 class ATC2TransmitterEntityRender() : Render() {
+    val modelObj: IModelNGT by lazy {
+        ModelPackManager.INSTANCE.loadModel("ATC02.mqo", 4, true, null)
+    }
+    val texture: ResourceLocation = ResourceLocation("textures/atc2.png")
+
     companion object {
         val INSTANCE = ATC2TransmitterEntityRender()
     }
 
     private fun renderEntityATC2(
-        entity: EntityInstalledObject,
+        entity: ATC2TransmitterEntity,
         x: Double,
         y: Double,
         z: Double,
@@ -26,10 +42,8 @@ class ATC2TransmitterEntityRender() : Render() {
         GL11.glEnable(GL12.GL_RESCALE_NORMAL)
         GL11.glTranslatef(x.toFloat(), y.toFloat(), z.toFloat())
         GL11.glRotatef(entity.rotationYaw, 0.0f, 1.0f, 0.0f)
-        val modelSet = entity.modelSet as ModelSetMachineClient
-        val cfg = modelSet.config
-        val pass = MinecraftForgeClient.getRenderPass()
-        modelSet.modelObj.render(entity, cfg, pass, par9)
+        FMLClientHandler.instance().client.renderEngine.bindTexture(texture)
+        modelObj.renderAll(false)
         GL11.glPopMatrix()
     }
 
@@ -38,6 +52,6 @@ class ATC2TransmitterEntityRender() : Render() {
     }
 
     override fun getEntityTexture(entity: Entity?): ResourceLocation? {
-        return null
+        return texture
     }
 }

@@ -152,7 +152,7 @@ open class ReceiverTrafficLightTile : TileNormal(), IRTMDetectorReceiver, IRTMTu
     fun shareAndPutCallList() {
         if (worldObj != null && !worldObj.isRemote) {
             val signalLevel = SignalLevel.getSignal(electricity)
-            RTMSignalChannelMaster.getOrMakeChannelData(this.signalChannelKeysPair.keyString)
+            RTMSignalChannelMaster.getOrMakeChannelData(this.signalChannelKeysPair)
                 ?.setSignalLevelNowData(signalLevel)
             RTMSignalChannelMaster.putCallList(this.signalChannelKeysPair.keyString, signalLevel)
         }

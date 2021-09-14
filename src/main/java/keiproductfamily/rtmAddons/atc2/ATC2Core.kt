@@ -124,11 +124,10 @@ object ATC2Core {
         }
 
         fun calcAndExeSignalLevel() {
-            val turnOutChannel = turnOutChannelKeyPair?.keyString?.let { RTMTurnoutChannelMaster.getChannelData(it) }
             val signalLChannelL =
-                signalChannelKeyPairL?.keyString?.let { RTMSignalChannelMaster.getOrMakeChannelData(it) }
+                signalChannelKeyPairL?.let { RTMSignalChannelMaster.getOrMakeChannelData(it) }
             val signalLChannelR =
-                signalChannelKeyPairR?.keyString?.let { RTMSignalChannelMaster.getOrMakeChannelData(it) }
+                signalChannelKeyPairR?.let { RTMSignalChannelMaster.getOrMakeChannelData(it) }
 
             var ret = 0
             when (nowSide) {

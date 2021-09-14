@@ -13,8 +13,6 @@ class RTMTurnoutChannelData(val channelKey: String) {
     var turnoutForce: EnumTurnOutSyncSelection? = null
     var iRTMTReceivers = HashSet<IRTMTurnoutReceiver>()
 
-    //TODO Forceを呼ぶとSync()でNowSwitchがよばれてForループのエラー落ちする
-
     fun setTurnOutNowSwitchData(turnoutSide: EnumTurnOutSwitch) {
         if (this.turnoutNowSide == null || this.turnoutNowSide != turnoutSide) {
             this.turnoutNowSide = turnoutSide

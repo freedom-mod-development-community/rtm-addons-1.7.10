@@ -18,10 +18,13 @@ import keiproductfamily.rtmAddons.ChannelKeyPair
 import keiproductfamily.rtmAddons.RequestEntityNBTData
 import keiproductfamily.rtmAddons.detectorChannel.EnumDirection
 import keiproductfamily.rtmAddons.detectorChannel.RTMDetectorChannelMaster
+import net.minecraft.entity.Entity
 import net.minecraft.entity.player.EntityPlayer
+import net.minecraft.init.Blocks
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.AxisAlignedBB
+import net.minecraft.util.DamageSource
 import net.minecraft.world.World
 import kotlin.math.abs
 import kotlin.math.atan2
@@ -31,8 +34,8 @@ class EntityTrainDetectorAdvance(world: World?) : EntityElectricalWiring(world),
     private var findTrain = false
     var channelKeyPair: ChannelKeyPair = ChannelKeyPair("", "")
 
-    override fun entityInit() {
-        super.entityInit()
+    override fun shouldRenderInPass(pass: Int): Boolean {
+        return pass >= 0
     }
 
     override fun setEntityId(p_145769_1_: Int) {
@@ -43,12 +46,23 @@ class EntityTrainDetectorAdvance(world: World?) : EntityElectricalWiring(world),
     }
 
     public override fun writeEntityToNBT(nbt: NBTTagCompound) {
-        super.writeEntityToNBT(nbt)
         nbt.setChannelKeyPair("channelKeyPair", channelKeyPair)
     }
 
     public override fun readEntityFromNBT(nbt: NBTTagCompound) {
         channelKeyPair = nbt.getChannelKeyPair("channelKeyPair")
+    }
+
+    override fun canBePushed(): Boolean {
+        return false
+    }
+
+    override fun canBeCollidedWith(): Boolean {
+        return !isDead
+    }
+
+    override fun canTriggerWalking(): Boolean {
+        return false
     }
 
     val channelKey: String
@@ -156,6 +170,38 @@ class EntityTrainDetectorAdvance(world: World?) : EntityElectricalWiring(world),
         return Pair(null, EnumDirection.Null)
     }
 
+    override fun attackEntityFrom(par1: DamageSource, par2: Float): Boolean {
+        return if (this.isEntityInvulnerable || isDead) {
+            false
+        } else {
+            if (par1.entity is EntityPlayer) {
+                if (!worldObj.isRemote) {
+                    setBeenAttacked()
+                    val entityplayer = par1.entity as EntityPlayer
+                    if (!entityplayer.capabilities.isCreativeMode) {
+                        dropItems()
+                    }
+                    val block = Blocks.stone
+                    worldObj.playSoundEffect(
+                        posX,
+                        posY,
+                        posZ,
+                        block.stepSound.func_150496_b(),
+                        (block.stepSound.getVolume() + 1.0f) / 2.0f,
+                        block.stepSound.pitch * 0.8f
+                    )
+                    setDead()
+                }
+                return true
+            }
+            false
+        }
+    }
+
+    override fun moveEntity(par1: Double, par3: Double, par5: Double) {}
+
+    override fun addVelocity(par1: Double, par3: Double, par5: Double) {}
+
     override fun interactFirst(player: EntityPlayer): Boolean {
         if (player.heldItem == null || player.heldItem.item !is ItemWire) {
             if (worldObj.isRemote) {
@@ -177,6 +223,7 @@ class EntityTrainDetectorAdvance(world: World?) : EntityElectricalWiring(world),
         get() = if (findTrain) ModCommonVar.findTrainLevel else ModCommonVar.notfindTrainLevel
 
     override fun setElectricity(par1: Int) {}
+
     override fun dropItems() {
         entityDropItem(ItemStack(ModKEIProductFamily.itemTrainDetectorAdvance), 0.0f)
     }
