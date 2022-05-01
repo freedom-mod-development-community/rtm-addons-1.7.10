@@ -13,7 +13,6 @@ import cpw.mods.fml.common.gameevent.TickEvent;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.registry.EntityRegistry;
 import cpw.mods.fml.common.registry.GameRegistry;
-import keiproductfamily.PermissionList.IParmission;
 import keiproductfamily.PermissionList.PermissionCompanyList;
 import keiproductfamily.network.PacketHandler;
 import keiproductfamily.rtmAddons.atc2.ATC2Core;
@@ -29,9 +28,10 @@ import keiproductfamily.rtmAddons.scWirelessAdvance.TileEntitySC_WirelessAdvance
 import keiproductfamily.rtmAddons.tablet.ItemRTMTablet;
 import keiproductfamily.rtmAddons.trainDetector.EntityTrainDetectorAdvance;
 import keiproductfamily.rtmAddons.trainDetector.ItemTrainDetectorAdvance;
+import keiproductfamily.rtmAddons.trainwarningradio.trainapproachwarning.*;
+import keiproductfamily.rtmAddons.trainwarningradio.trainprotectionradio.*;
 import keiproductfamily.rtmAddons.turnoutSelector.TurnoutSelectorTile;
 import kotlin.Suppress;
-import net.minecraft.block.Block;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraft.nbt.NBTTagCompound;
@@ -56,7 +56,7 @@ public class ModKEIProductFamily {
     public static KEIProxy proxy;
 
 
-    public static Block creativeTabIcon;
+    public static Item creativeTabIcon;
     public static CreativeTabs keipfCreativeTabs = new CreativeTabKEIPF();
     public static Item itemTrainDetectorAdvance = new ItemTrainDetectorAdvance();
     public static Item itemATC2Transmitter = new ATC2TransmitterItem();
@@ -69,16 +69,15 @@ public class ModKEIProductFamily {
 //        GameRegistry.registerTileEntity(ChunkLoadTile.class, "ChunkLoadTile");
 //        GameRegistry.registerBlock(new AdvanceChunkLoadBlock(), "AdvanceChunkLoadBlock");
 //        GameRegistry.registerTileEntity(AdvanceChunkLoadTile.class, "AdvanceChunkLoadTile");
-//        GameRegistry.registerItem(new TAWSendItem(), "TAWSendItem");
-//        GameRegistry.registerItem(new TAWReceiveItem(), "TAWReceiveItem");
-//        GameRegistry.registerBlock(new TAWReceiveBlock(), "TAWReceiveBlock");
-//        GameRegistry.registerTileEntity(TAWReceiveBlockTile.class, "TAWReceiveTile");
-//        GameRegistry.registerItem(new TPRSendItem(), "TPRSendItem");
-//        GameRegistry.registerItem(new TPRReceiveItem(), "TPRReceiveItem");
-//        GameRegistry.registerBlock(new TPRSendBlock(), "TPRSendBlock");
-//        GameRegistry.registerTileEntity(TPRSendBlockTile.class, "TPRSendTile");
-        creativeTabIcon = new BlockSCWirelessAdvance();
-        GameRegistry.registerBlock(creativeTabIcon, "BlockSCWirelessAdvance");
+        GameRegistry.registerItem(new TAWSendItem(), "TAWSendItem");
+        GameRegistry.registerItem(new TAWReceiveItem(), "TAWReceiveItem");
+        GameRegistry.registerBlock(new TAWReceiveBlock(), "TAWReceiveBlock");
+        GameRegistry.registerTileEntity(TAWReceiveBlockTile.class, "TAWReceiveTile");
+        GameRegistry.registerItem(new TPRSendItem(), "TPRSendItem");
+        GameRegistry.registerItem(new TPRReceiveItem(), "TPRReceiveItem");
+        GameRegistry.registerBlock(new TPRSendBlock(), "TPRSendBlock");
+        GameRegistry.registerTileEntity(TPRSendBlockTile.class, "TPRSendTile");
+        GameRegistry.registerBlock(new BlockSCWirelessAdvance(), "BlockSCWirelessAdvance");
         GameRegistry.registerTileEntity(TileEntitySC_WirelessAdvance.class, "TileEntitySC_WirelessAdvance");
 
         GameRegistry.registerItem(itemTrainDetectorAdvance, "itemTrainDetectorAdvance");
@@ -97,6 +96,7 @@ public class ModKEIProductFamily {
 
         GameRegistry.registerItem(itemATC2Transmitter, "atc2TransmitterItem");
         GameRegistry.registerItem(itemRTMTablet, "itemRTMTablet");
+        creativeTabIcon = itemRTMTablet;
 
         ForgeChunkManager.setForcedChunkLoadingCallback(this, new ForgeChunkManager.LoadingCallback() {
             public void ticketsLoaded(List<ForgeChunkManager.Ticket> tickets, World world) {
@@ -164,8 +164,8 @@ public class ModKEIProductFamily {
     @SubscribeEvent
     public void onServerTick(TickEvent.ServerTickEvent event) {
         if (event.phase == TickEvent.Phase.END) {
-//            TAWMaster.updateTick();
-//            TPRMaster.updateTick();
+            TAWMaster.updateTick();
+            TPRMaster.updateTick();
             ATC2Core.INSTANCE.tick();
         }
     }
