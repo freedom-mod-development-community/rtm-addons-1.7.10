@@ -12,7 +12,7 @@ public class CreativeTabKEIPF extends CreativeTabs {
 
     @Override
     public Item getTabIconItem() {
-        return Item.getItemFromBlock(ModKEIProductFamily.creativeTabIcon);
+        return ModKEIProductFamily.creativeTabIcon;
     }
 
     @Override
