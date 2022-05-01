@@ -20,6 +20,7 @@ open class ReceiverTrafficLightMessage : TileEntityMessage, IMessageHandler<Rece
     var forcedSignalSelection: EnumForcedSignalMode by Delegates.notNull()
     var turnOutSyncSelection: EnumTurnOutSyncSelection by Delegates.notNull()
     var turnOutChannelKeyPair: ChannelKeyPair by Delegates.notNull()
+    var signalChannelKeysPair: ChannelKeyPair by Delegates.notNull()
     var forceSelectSignal: SignalLevel by Delegates.notNull()
 
     constructor()
@@ -30,12 +31,14 @@ open class ReceiverTrafficLightMessage : TileEntityMessage, IMessageHandler<Rece
         forcedSignalSelection: EnumForcedSignalMode,
         turnOutSyncSelection: EnumTurnOutSyncSelection,
         turnOutChannelKey: ChannelKeyPair,
+        signalChannelKeysPair: ChannelKeyPair,
         forceSelectSignal: SignalLevel
     ) : super(tile) {
         this.detectorChannelKeys = detectorChannelKeys
         this.forcedSignalSelection = forcedSignalSelection
         this.turnOutSyncSelection = turnOutSyncSelection
         this.turnOutChannelKeyPair = turnOutChannelKey
+        this.signalChannelKeysPair = signalChannelKeysPair
         this.forceSelectSignal = forceSelectSignal
     }
 
@@ -47,6 +50,7 @@ open class ReceiverTrafficLightMessage : TileEntityMessage, IMessageHandler<Rece
         this.forcedSignalSelection = EnumForcedSignalMode.getType(buf.readInt())
         this.turnOutSyncSelection = EnumTurnOutSyncSelection.getType(buf.readInt())
         this.turnOutChannelKeyPair = ChannelKeyPair.readFromBuf(buf)
+        this.signalChannelKeysPair = ChannelKeyPair.readFromBuf(buf)
         this.forceSelectSignal = SignalLevel.getSignal(buf.readInt())
     }
 
@@ -58,6 +62,7 @@ open class ReceiverTrafficLightMessage : TileEntityMessage, IMessageHandler<Rece
         buf.writeInt(forcedSignalSelection.id)
         buf.writeInt(turnOutSyncSelection.id)
         turnOutChannelKeyPair.writeToByteBuf(buf)
+        signalChannelKeysPair.writeToByteBuf(buf)
         buf.writeInt(forceSelectSignal.level)
     }
 
@@ -67,6 +72,7 @@ open class ReceiverTrafficLightMessage : TileEntityMessage, IMessageHandler<Rece
         } else {
             val tile = message?.getTileEntity(ctx)
             if (tile is ReceiverTrafficLightTile) {
+                tile.signalChannelKeysPair = message.signalChannelKeysPair
                 tile.detectorChannelKeys = message.detectorChannelKeys
                 tile.turnOutChannelKeyPair = message.turnOutChannelKeyPair
                 tile.setDatas(

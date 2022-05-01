@@ -55,11 +55,11 @@ object RTMDetectorChannelMaster {
     }
 
 
-    private val calledList = LinkedHashMap<String, DataSet>()
+    private val calledList = LinkedHashMap<String, DetectorCallDataSet>()
 
     fun putCallList(channelKey: String, signalLevel: SignalLevel, rollSignID: Byte, formationID: Long, direction: EnumDirection) {
         calledList.remove(channelKey)
-        calledList[channelKey] = DataSet(signalLevel, rollSignID, formationID, direction)
+        calledList[channelKey] = DetectorCallDataSet(signalLevel, rollSignID, formationID, direction)
     }
 
     fun reCallList(receiver: IRTMDetectorReceiver) {
@@ -68,5 +68,5 @@ object RTMDetectorChannelMaster {
         }
     }
 
-    data class DataSet(val signalLevel: SignalLevel, val rollSignID: Byte, val formationID: Long, val direction: EnumDirection)
+    data class DetectorCallDataSet(val signalLevel: SignalLevel, val rollSignID: Byte, val formationID: Long, val direction: EnumDirection)
 }

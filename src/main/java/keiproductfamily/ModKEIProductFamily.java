@@ -16,11 +16,17 @@ import cpw.mods.fml.common.registry.GameRegistry;
 import keiproductfamily.PermissionList.IParmission;
 import keiproductfamily.PermissionList.PermissionCompanyList;
 import keiproductfamily.network.PacketHandler;
+import keiproductfamily.rtmAddons.atc2.ATC2Core;
+import keiproductfamily.rtmAddons.atc2.Atc2Gui;
+import keiproductfamily.rtmAddons.atc2.transmitter.ATC2TransmitterEntity;
+import keiproductfamily.rtmAddons.atc2.transmitter.ATC2TransmitterItem;
+import keiproductfamily.rtmAddons.formationNumber.FormationNumberCore;
 import keiproductfamily.rtmAddons.receiverBlock.receiverTraffficLightsType2.ReceiverTrafficLightTileType2;
 import keiproductfamily.rtmAddons.receiverBlock.receiverTrafficLights.ReceiverTrafficLightTile;
 import keiproductfamily.rtmAddons.receiverBlock.receiverTurnout.ReceiverTurnoutTile;
 import keiproductfamily.rtmAddons.scWirelessAdvance.BlockSCWirelessAdvance;
 import keiproductfamily.rtmAddons.scWirelessAdvance.TileEntitySC_WirelessAdvance;
+import keiproductfamily.rtmAddons.tablet.ItemRTMTablet;
 import keiproductfamily.rtmAddons.trainDetector.EntityTrainDetectorAdvance;
 import keiproductfamily.rtmAddons.trainDetector.ItemTrainDetectorAdvance;
 import keiproductfamily.rtmAddons.turnoutSelector.TurnoutSelectorTile;
@@ -39,7 +45,7 @@ import net.minecraftforge.event.world.WorldEvent;
 
 import java.util.List;
 
-@Mod(modid = ModKEIProductFamily.MOD_ID, name = "Kuma Electric Industry Product Family", version = Constants.version, dependencies="after:RTM")
+@Mod(modid = ModKEIProductFamily.MOD_ID, name = "Kuma Electric Industry Product Family", version = Constants.version, dependencies = "after:RTM")
 public class ModKEIProductFamily {
     public static final String MOD_ID = "KEIProductFamily";
     public static final String DOMAIN = "keiproductfamily";
@@ -53,6 +59,8 @@ public class ModKEIProductFamily {
     public static Block creativeTabIcon;
     public static CreativeTabs keipfCreativeTabs = new CreativeTabKEIPF();
     public static Item itemTrainDetectorAdvance = new ItemTrainDetectorAdvance();
+    public static Item itemATC2Transmitter = new ATC2TransmitterItem();
+    public static Item itemRTMTablet = new ItemRTMTablet();
 
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
@@ -72,6 +80,7 @@ public class ModKEIProductFamily {
         creativeTabIcon = new BlockSCWirelessAdvance();
         GameRegistry.registerBlock(creativeTabIcon, "BlockSCWirelessAdvance");
         GameRegistry.registerTileEntity(TileEntitySC_WirelessAdvance.class, "TileEntitySC_WirelessAdvance");
+
         GameRegistry.registerItem(itemTrainDetectorAdvance, "itemTrainDetectorAdvance");
 
         GameRegistry.registerBlock(ModCommonVar.receiverTrafficLightBlock, "ReceiverTrafficLightBlock");
@@ -85,6 +94,9 @@ public class ModKEIProductFamily {
 
         GameRegistry.registerBlock(ModCommonVar.receiverTrafficLightBlockType2, "ReceiverTrafficLightBlockType2");
         GameRegistry.registerTileEntity(ReceiverTrafficLightTileType2.class, "ReceiverTrafficLightTileType2");
+
+        GameRegistry.registerItem(itemATC2Transmitter, "atc2TransmitterItem");
+        GameRegistry.registerItem(itemRTMTablet, "itemRTMTablet");
 
         ForgeChunkManager.setForcedChunkLoadingCallback(this, new ForgeChunkManager.LoadingCallback() {
             public void ticketsLoaded(List<ForgeChunkManager.Ticket> tickets, World world) {
@@ -104,6 +116,9 @@ public class ModKEIProductFamily {
 
         FMLCommonHandler.instance().bus().register(this);
         MinecraftForge.EVENT_BUS.register(this);
+        if (event.getSide().isClient()) {
+            MinecraftForge.EVENT_BUS.register(Atc2Gui.INSTANCE);
+        }
         PacketHandler.init();
         proxy.preInit();
     }
@@ -111,6 +126,7 @@ public class ModKEIProductFamily {
     @Mod.EventHandler
     public void init(FMLInitializationEvent event) {
         EntityRegistry.registerModEntity(EntityTrainDetectorAdvance.class, "EntityTrainDetectorAdvance", 301, ModKEIProductFamily.instance, 1024, 3, false);
+        EntityRegistry.registerModEntity(ATC2TransmitterEntity.class, "ATC2TransmitterEntity", 302, ModKEIProductFamily.instance, 1024, 3, false);
         NetworkRegistry.INSTANCE.registerGuiHandler(instance, new GuiHandler());
         proxy.Init();
     }
@@ -119,28 +135,30 @@ public class ModKEIProductFamily {
     public void WorldLoadEvent(WorldEvent.Load event) {
         if (!event.world.isRemote) {
             PermissionCompanyList.read();
+            FormationNumberCore.INSTANCE.read();
         }
         TileEntitySC_WirelessAdvance.initLastLevel_MAP();
     }
 
     @SubscribeEvent
     public void onPlaceEvent(BlockEvent.PlaceEvent event) {
-        if (event.block instanceof IParmission) {
-            if (!PermissionCompanyList.canUseByKey(((IParmission) event.block).getName(), event.player)) {
-                event.setCanceled(true);
-            }
-        }
+//        if (event.block instanceof IParmission) {
+//            if (!PermissionCompanyList.canUseByKey(((IParmission) event.block).getName(), event.player)) {
+//                event.setCanceled(true);
+//            }
+//        }
     }
 
     @SubscribeEvent
     public void onPlayerInteractEvent(PlayerInteractEvent event) {
-        if (!event.world.isRemote) {
-            if (event.action == PlayerInteractEvent.Action.RIGHT_CLICK_AIR && event.entityPlayer.getHeldItem() != null && event.entityPlayer.getHeldItem().getItem() instanceof IParmission) {
-                if (!PermissionCompanyList.canUseByKey(((IParmission) event.entityPlayer.getHeldItem().getItem()).getName(), event.entityPlayer)) {
-                    event.setCanceled(true);
-                }
-            }
-        }
+//        if (!event.world.isRemote) {
+//            if ((event.action == PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK || event.action == PlayerInteractEvent.Action.RIGHT_CLICK_AIR)
+//                    && event.entityPlayer.getHeldItem() != null && event.entityPlayer.getHeldItem().getItem() instanceof IParmission) {
+//                if (!PermissionCompanyList.canUseByKey(((IParmission) event.entityPlayer.getHeldItem().getItem()).getName(), event.entityPlayer)) {
+//                    event.setCanceled(true);
+//                }
+//            }
+//        }
     }
 
     @SubscribeEvent
@@ -148,6 +166,7 @@ public class ModKEIProductFamily {
         if (event.phase == TickEvent.Phase.END) {
 //            TAWMaster.updateTick();
 //            TPRMaster.updateTick();
+            ATC2Core.INSTANCE.tick();
         }
     }
 

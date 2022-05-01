@@ -1,21 +1,14 @@
-package keiproductfamily.rtmAddons
+package keiproductfamily.rtmAddons.formationNumber
 
 import cpw.mods.fml.common.network.ByteBufUtils
 import io.netty.buffer.ByteBuf
 import io.netty.buffer.Unpooled
 
-data class ChannelKeyPair(
+class FormationNumberKeyPair(
     val name: String = "",
     val number: String = ""
 ) {
-    val keyString: String by lazy {
-        if (hasData()) {
-            toString()
-        } else {
-            ""
-        }
-    }
-
+    val keyString: String by lazy { toString() }
     override fun toString(): String = "$name-$number"
 
     fun hasData(): Boolean = name != "" && number != ""
@@ -34,7 +27,7 @@ data class ChannelKeyPair(
         if (this === other) {
             return true
         }
-        return if (other is ChannelKeyPair) {
+        return if (other is FormationNumberKeyPair) {
             this.name == other.name && this.number == other.number
         } else {
             false
@@ -46,14 +39,14 @@ data class ChannelKeyPair(
     }
 
     companion object {
-        fun readFromBuf(buf: ByteBuf): ChannelKeyPair {
-            return ChannelKeyPair(
+        fun readFromBuf(buf: ByteBuf): FormationNumberKeyPair {
+            return FormationNumberKeyPair(
                 ByteBufUtils.readUTF8String(buf),
                 ByteBufUtils.readUTF8String(buf)
             )
         }
 
-        fun readFromByteArray(array: ByteArray): ChannelKeyPair {
+        fun readFromByteArray(array: ByteArray): FormationNumberKeyPair {
             return readFromBuf(Unpooled.buffer().writeBytes(array))
         }
     }

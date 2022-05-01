@@ -9,7 +9,11 @@ tile.TPRSendBlock.name=Train Protection Radio Sender Block
 tile.ReceiverTrafficLight.name=Receiver Block for Traffic Light
 tile.ReceiverTrafficLightType2.name=Receiver Block for Traffic Light Type2
 tile.ReceiverTurnout.name=Receiver Block for Turnout
-tile.TurnoutSelecter.name=Turnout Selecter
+tile.TurnoutSelector.name=Turnout Selecter
+
+item.itemTrainDetectorAdvance.name=Train Detector Advance
+item.itemRTMTablet.name=RTM Tablet
+item.atc2TransmitterItem.name=ATC2 Transmitter
 
 Kuma Electric Industry Product Family=Kuma Electric Industry Product Family
 

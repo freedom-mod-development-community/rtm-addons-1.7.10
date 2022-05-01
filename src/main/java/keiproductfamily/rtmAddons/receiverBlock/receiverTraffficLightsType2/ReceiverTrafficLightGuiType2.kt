@@ -20,14 +20,16 @@ class ReceiverTrafficLightGuiType2(private val tile: ReceiverTrafficLightTileTyp
     var turnOutSyncSelection2: EnumTurnOutSyncSelection by Delegates.notNull()
     var turnOutChannelKeyPair: ChannelKeyPair by Delegates.notNull()
     var turnOutChannelKeyPair2: ChannelKeyPair by Delegates.notNull()
+    var signalChannelKeyPair: ChannelKeyPair by Delegates.notNull()
     var forceSelectSignal: SignalLevel by Delegates.notNull()
 
-    private var signalChannelKeys: Array<Array<GuiTextFieldWithID>> by Delegates.notNull()
+    private var tfDetectorChannelKeys: Array<Array<GuiTextFieldWithID>> by Delegates.notNull()
     private var turnoutChannelKeys: Array<GuiTextFieldWithID> by Delegates.notNull()
     private var turnoutChannelKeys2: Array<GuiTextFieldWithID> by Delegates.notNull()
     private var forceModeButtons: Array<EnumGuiButton<EnumForcedSignalMode>> by Delegates.notNull()
     private var turnOutSyncButtons: Array<EnumGuiButton<EnumTurnOutSyncSelection>> by Delegates.notNull()
     private var turnOutSyncButtonsType2: Array<EnumGuiButton<EnumTurnOutSyncSelection>> by Delegates.notNull()
+    private var tfSignalChannelKeys: Array<GuiTextFieldWithID> by Delegates.notNull()
     private var forceSelectSignalButtons: Array<EnumGuiButton<SignalLevel>> by Delegates.notNull()
 
     override fun initGui() {
@@ -37,6 +39,7 @@ class ReceiverTrafficLightGuiType2(private val tile: ReceiverTrafficLightTileTyp
         this.turnOutSyncSelection2 = tile.turnOutSyncSelection2
         this.turnOutChannelKeyPair = tile.turnOutChannelKeyPair
         this.turnOutChannelKeyPair2 = tile.turnOutChannelKeyPair2
+        this.signalChannelKeyPair = tile.signalChannelKeysPair
         this.forceSelectSignal = tile.forceSelectSignal
 
         super.initGui()
@@ -45,8 +48,8 @@ class ReceiverTrafficLightGuiType2(private val tile: ReceiverTrafficLightTileTyp
         buttonList.add(GuiButton(1, width / 2 + 5, height - 28, 150, 20, I18n.format("gui.cancel", *arrayOfNulls(0))))
 
         forceModeButtons = arrayOf(
-            EnumGuiButton(10, width / 2 - 50, height - 70, 50, 20, "Auto", EnumForcedSignalMode.Auto),
-            EnumGuiButton(10, width / 2 + 115, height - 70, 50, 20, "ForceSelect", EnumForcedSignalMode.ForceSelect)
+            EnumGuiButton(10, width / 2 - 50, height - 60, 50, 20, "Auto", EnumForcedSignalMode.Auto),
+            EnumGuiButton(10, width / 2 + 115, height - 60, 50, 20, "ForceSelect", EnumForcedSignalMode.ForceSelect)
         )
         buttonList.addAll(forceModeButtons)
 
@@ -87,11 +90,11 @@ class ReceiverTrafficLightGuiType2(private val tile: ReceiverTrafficLightTileTyp
 
 
         textFields.clear()
-        signalChannelKeys = Array<Array<GuiTextFieldWithID>>(6) { i ->
+        tfDetectorChannelKeys = Array<Array<GuiTextFieldWithID>>(6) { i ->
             val (first, second) = this.detectorChannelKeys[i]
             arrayOf(
-                setTextFieldWithID(i * 10, width / 2 - 120, 30 + 20 * i, 40, 15, first),
-                setTextFieldWithID(i * 10 + 1, width / 2 - 60, 30 + 20 * i, 40, 15, second)
+                setTextFieldWithID(i * 10, width / 2 - 120, 60 + 20 * i, 40, 15, first),
+                setTextFieldWithID(i * 10 + 1, width / 2 - 60, 60 + 20 * i, 40, 15, second)
             )
         }
         turnoutChannelKeys = arrayOf(
@@ -101,6 +104,11 @@ class ReceiverTrafficLightGuiType2(private val tile: ReceiverTrafficLightTileTyp
         turnoutChannelKeys2 = arrayOf(
             setTextFieldWithID(102, width / 2, 110, 40, 15, this.turnOutChannelKeyPair2.name),
             setTextFieldWithID(103, width / 2 + 50, 110, 40, 15, this.turnOutChannelKeyPair2.number),
+        )
+
+        tfSignalChannelKeys = arrayOf(
+            setTextFieldWithID(104, width / 2 - 120, 20, 40, 15, this.signalChannelKeyPair.name),
+            setTextFieldWithID(105, width / 2 - 60, 20, 40, 15, this.signalChannelKeyPair.number),
         )
     }
 
@@ -175,8 +183,8 @@ class ReceiverTrafficLightGuiType2(private val tile: ReceiverTrafficLightTileTyp
         formatSignalLevel()
         val detectorChannelKeys = Array<ChannelKeyPair>(6) { i ->
             ChannelKeyPair(
-                signalChannelKeys[i][0].text,
-                signalChannelKeys[i][1].text
+                tfDetectorChannelKeys[i][0].text,
+                tfDetectorChannelKeys[i][1].text
             )
         }
         val turnoutChannelKey = ChannelKeyPair(
@@ -189,6 +197,11 @@ class ReceiverTrafficLightGuiType2(private val tile: ReceiverTrafficLightTileTyp
             turnoutChannelKeys2[1].text
         )
 
+        val signalChannelKey = ChannelKeyPair(
+            tfSignalChannelKeys[0].text,
+            tfSignalChannelKeys[1].text
+        )
+
         PacketHandler.sendPacketServer(
             ReceiverTrafficLightMessageType2(
                 tile,
@@ -198,6 +211,7 @@ class ReceiverTrafficLightGuiType2(private val tile: ReceiverTrafficLightTileTyp
                 this.turnOutSyncSelection2,
                 turnoutChannelKey,
                 turnoutChannelKey2,
+                signalChannelKey,
                 this.forceSelectSignal
             )
         )
@@ -205,8 +219,8 @@ class ReceiverTrafficLightGuiType2(private val tile: ReceiverTrafficLightTileTyp
 
     private fun formatSignalLevel() {
         for (i in 0 until 6) {
-            val num = NGTMath.getIntFromString(signalChannelKeys[i][1].text, 0, 999, 0)
-            signalChannelKeys[i][1].text = num.toString()
+            val num = NGTMath.getIntFromString(tfDetectorChannelKeys[i][1].text, 0, 999, 0)
+            tfDetectorChannelKeys[i][1].text = num.toString()
         }
     }
 
@@ -214,13 +228,13 @@ class ReceiverTrafficLightGuiType2(private val tile: ReceiverTrafficLightTileTyp
         if (nowID < 100) {
             var i = nowID / 10
             return if (nowID and 1 == 0) {
-                signalChannelKeys[i][1]
+                tfDetectorChannelKeys[i][1]
             } else {
                 i++
-                if (i >= signalChannelKeys.size) {
+                if (i >= tfDetectorChannelKeys.size) {
                     i = 0
                 }
-                signalChannelKeys[i][0]
+                tfDetectorChannelKeys[i][0]
             }
         } else if(nowID < 102){
             return if (nowID and 1 == 0) {
@@ -228,11 +242,17 @@ class ReceiverTrafficLightGuiType2(private val tile: ReceiverTrafficLightTileTyp
             } else {
                 turnoutChannelKeys[0]
             }
-        } else {
+        } else if(nowID < 104) {
             return if (nowID and 1 == 0) {
                 turnoutChannelKeys2[1]
             } else {
                 turnoutChannelKeys2[0]
+            }
+        } else {
+            return if (nowID and 1 == 0) {
+                tfSignalChannelKeys[1]
+            } else {
+                tfSignalChannelKeys[0]
             }
         }
     }
@@ -340,19 +360,22 @@ class ReceiverTrafficLightGuiType2(private val tile: ReceiverTrafficLightTileTyp
         }
         drawDefaultBackground()
         super.drawScreen(par1, par2, par3)
-        drawCenteredString(fontRendererObj, "Detector", width / 2 - 70, 5, 16777215)
-        drawCenteredString(fontRendererObj, " Name     -    Number", width / 2 - 70, 15, 16777215)
+        drawCenteredString(fontRendererObj, "Signal Light (This)", width / 2 - 70, 3, 16777215)
+        drawCenteredString(fontRendererObj, " Name     -    Number", width / 2 - 70, 11, 16777215)
+
+        drawCenteredString(fontRendererObj, "Detector", width / 2 - 70, 41, 16777215)
+        drawCenteredString(fontRendererObj, " Name     -    Number", width / 2 - 70, 49, 16777215)
         for (i in 0 until 6) {
             drawString(
                 fontRendererObj,
                 (i + 1).toString() + ":" + I18n.format(SignalLevel.getSignal(i + 1).name),
                 width / 2 - 200,
-                34 + i * 20,
+                64 + i * 20,
                 16777215
             )
         }
         for (i in 0 until 6) {
-            drawCenteredString(fontRendererObj, "-", width / 2 - 70, 34 + i * 20, 16777215)
+            drawCenteredString(fontRendererObj, "-", width / 2 - 70, 64 + i * 20, 16777215)
         }
         drawCenteredString(fontRendererObj, "TurnOut", width / 2 + 45, 15, -1)
         drawCenteredString(fontRendererObj, " Name   -  Number", width / 2 + 45, 25, -1)

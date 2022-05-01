@@ -1,6 +1,9 @@
 package keiproductfamily.rtmAddons.trainDetector;
 
+import cpw.mods.fml.client.FMLClientHandler;
+import jp.ngt.ngtlib.renderer.model.IModelNGT;
 import jp.ngt.rtm.entity.EntityInstalledObject;
+import jp.ngt.rtm.modelpack.ModelPackManager;
 import jp.ngt.rtm.modelpack.cfg.MachineConfig;
 import jp.ngt.rtm.modelpack.modelset.ModelSetMachineClient;
 import net.minecraft.client.renderer.entity.Render;
@@ -13,6 +16,9 @@ import org.lwjgl.opengl.GL12;
 public class RenderEntityTrainDetectorAdvance extends Render {
     public static final RenderEntityTrainDetectorAdvance INSTANCE = new RenderEntityTrainDetectorAdvance();
 
+    IModelNGT modelObj = ModelPackManager.INSTANCE.loadModel("ATC01.mqo", 4, true, null);
+    ResourceLocation texture = new ResourceLocation("textures/advanceTrainDetector.png");
+
     private RenderEntityTrainDetectorAdvance() {
     }
 
@@ -21,12 +27,8 @@ public class RenderEntityTrainDetectorAdvance extends Render {
         GL11.glEnable(GL12.GL_RESCALE_NORMAL);
         GL11.glTranslatef((float) x, (float) y, (float) z);
         GL11.glRotatef(entity.rotationYaw, 0.0F, 1.0F, 0.0F);
-
-        ModelSetMachineClient modelSet = (ModelSetMachineClient) entity.getModelSet();
-        MachineConfig cfg = modelSet.getConfig();
-        int pass = MinecraftForgeClient.getRenderPass();
-        modelSet.modelObj.render(entity, cfg, pass, par9);
-
+        FMLClientHandler.instance().getClient().renderEngine.bindTexture(texture);
+        modelObj.renderAll(false);
         GL11.glPopMatrix();
     }
 

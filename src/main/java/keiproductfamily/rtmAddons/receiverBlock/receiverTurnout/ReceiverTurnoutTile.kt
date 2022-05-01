@@ -157,7 +157,7 @@ class ReceiverTurnoutTile : TileNormal(), IRTMDetectorReceiver, IRTMTurnoutRecei
     override fun onNewTurnoutForceSelect(channelKey: String, turnoutSelect: EnumTurnOutSyncSelection): Boolean {
         if (channelKey == thisTurnOutChannelKeyPair.keyString) {
             turnOutOperation = turnoutSelect
-            syncNowSwitchData()
+            //syncNowSwitchData()
             markDirtyAndNotify()
             return true
         }

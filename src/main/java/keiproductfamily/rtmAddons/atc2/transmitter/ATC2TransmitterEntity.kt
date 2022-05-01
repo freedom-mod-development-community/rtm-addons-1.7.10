@@ -1,23 +1,21 @@
-package keiproductfamily.rtmAddons.trainDetector
+package keiproductfamily.rtmAddons.atc2.transmitter
 
-import jp.ngt.ngtlib.network.PacketNBT
-import jp.ngt.rtm.electric.EntityElectricalWiring
-import jp.ngt.rtm.electric.SignalLevel
 import jp.ngt.rtm.entity.train.EntityBogie
 import jp.ngt.rtm.entity.train.EntityTrainBase
 import jp.ngt.rtm.entity.train.parts.EntityFloor
 import jp.ngt.rtm.item.ItemWire
-import jp.ngt.rtm.modelpack.cfg.MachineConfig
-import jp.ngt.rtm.modelpack.cfg.ModelConfig
-import jp.ngt.rtm.modelpack.modelset.ModelSetMachine
-import jp.ngt.rtm.modelpack.modelset.ModelSetMachineClient
-import keiproductfamily.*
+import keiproductfamily.GuiIDs
+import keiproductfamily.ModKEIProductFamily
 import keiproductfamily.PermissionList.IParmission
+import keiproductfamily.getChannelKeyPair
 import keiproductfamily.network.PacketHandler
 import keiproductfamily.rtmAddons.ChannelKeyPair
 import keiproductfamily.rtmAddons.RequestEntityNBTData
+import keiproductfamily.rtmAddons.atc2.ATC2Core
 import keiproductfamily.rtmAddons.detectorChannel.EnumDirection
-import keiproductfamily.rtmAddons.detectorChannel.RTMDetectorChannelMaster
+import keiproductfamily.rtmAddons.formationNumber.FormationNumberCore
+import keiproductfamily.rtmAddons.signalchannel.RTMSignalChannelMaster
+import keiproductfamily.setChannelKeyPair
 import net.minecraft.entity.Entity
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.init.Blocks
@@ -25,14 +23,18 @@ import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.DamageSource
+import net.minecraft.util.MovingObjectPosition
 import net.minecraft.world.World
 import kotlin.math.abs
 import kotlin.math.atan2
 import kotlin.math.min
 
-class EntityTrainDetectorAdvance(world: World?) : EntityElectricalWiring(world), IParmission {
+class ATC2TransmitterEntity(world: World) : Entity(world), IParmission {
     private var findTrain = false
-    var channelKeyPair: ChannelKeyPair = ChannelKeyPair("", "")
+    var signalChannelKeyPairL: ChannelKeyPair = ChannelKeyPair("", "")
+    var turnOutChannelKeyPair: ChannelKeyPair = ChannelKeyPair("", "")
+    var signalChannelKeyPairR: ChannelKeyPair = ChannelKeyPair("", "")
+    var subjectFormationRegex: String = ""
 
     override fun shouldRenderInPass(pass: Int): Boolean {
         return pass >= 0
@@ -45,12 +47,21 @@ class EntityTrainDetectorAdvance(world: World?) : EntityElectricalWiring(world),
         }
     }
 
+    override fun entityInit() {
+    }
+
     public override fun writeEntityToNBT(nbt: NBTTagCompound) {
-        nbt.setChannelKeyPair("channelKeyPair", channelKeyPair)
+        nbt.setChannelKeyPair("signalChannelKeyPairL", signalChannelKeyPairL)
+        nbt.setChannelKeyPair("turnOutChannelKeyPair", turnOutChannelKeyPair)
+        nbt.setChannelKeyPair("signalChannelKeyPairR", signalChannelKeyPairR)
+        nbt.setString("subjectFormationRegex", subjectFormationRegex)
     }
 
     public override fun readEntityFromNBT(nbt: NBTTagCompound) {
-        channelKeyPair = nbt.getChannelKeyPair("channelKeyPair")
+        signalChannelKeyPairL = nbt.getChannelKeyPair("signalChannelKeyPairL")
+        turnOutChannelKeyPair = nbt.getChannelKeyPair("turnOutChannelKeyPair")
+        signalChannelKeyPairR = nbt.getChannelKeyPair("signalChannelKeyPairR")
+        subjectFormationRegex = nbt.getString("subjectFormationRegex")
     }
 
     override fun canBePushed(): Boolean {
@@ -65,48 +76,75 @@ class EntityTrainDetectorAdvance(world: World?) : EntityElectricalWiring(world),
         return false
     }
 
-    val channelKey: String
-        get() = channelKeyPair.keyString
-
-    fun setChannelName(channelName: String, channelNumber: String) {
-        val name = channelName.trim { it <= ' ' }
-        val number = channelNumber.trim { it <= ' ' }
-        if (channelKeyPair.name != name || channelKeyPair.number != number) {
+    fun setSignalChannelNameL(channelKey: ChannelKeyPair) {
+        val name = channelKey.name.trim { it <= ' ' }
+        val number = channelKey.number.trim { it <= ' ' }
+        if (signalChannelKeyPairL.name != name || signalChannelKeyPairL.number != number) {
             if (name != "" && number != "") {
-                channelKeyPair = ChannelKeyPair(name, number)
-                RTMDetectorChannelMaster.makeChannel(channelKeyPair)
+                signalChannelKeyPairL = channelKey
+                RTMSignalChannelMaster.makeChannel(signalChannelKeyPairL)
             }
         }
     }
+
+    fun setSignalChannelNameR(channelKey: ChannelKeyPair) {
+        val name = channelKey.name.trim { it <= ' ' }
+        val number = channelKey.number.trim { it <= ' ' }
+        if (signalChannelKeyPairR.name != name || signalChannelKeyPairR.number != number) {
+            if (name != "" && number != "") {
+                signalChannelKeyPairR = channelKey
+                RTMSignalChannelMaster.makeChannel(signalChannelKeyPairR)
+            }
+        }
+    }
+
+    fun setTurnOutChannelName(channelKey: ChannelKeyPair) {
+        val name = channelKey.name.trim { it <= ' ' }
+        val number = channelKey.number.trim { it <= ' ' }
+        if (turnOutChannelKeyPair.name != name || turnOutChannelKeyPair.number != number) {
+            if (name != "" && number != "") {
+                turnOutChannelKeyPair = channelKey
+                RTMSignalChannelMaster.makeChannel(turnOutChannelKeyPair)
+            }
+        }
+    }
+
+
 
     var lastCollidedTrainFormationID: Long = -1
     var lastCollidedTrainFormationIDKeepCnt: Int = -1
     override fun onUpdate() {
         if (!worldObj.isRemote) {
-            if (channelKeyPair.number != "") {
-                val channelData = RTMDetectorChannelMaster.getChannelData(channelKey)
-                if (channelData != null) {
-                    val (train, direction) = getCollidedTrainData()
-                    if (train != null) {
-                        if (lastCollidedTrainFormationID != train.formation.id) {
-                            val rollSignID = train.getTrainStateData(8)
-                            lastCollidedTrainFormationID = train.formation.id
-                            channelData.setTrainData(
-                                ModCommonVar.findTrainLevel,
-                                rollSignID,
-                                lastCollidedTrainFormationID,
-                                direction
-                            )
-                        }
-                        lastCollidedTrainFormationIDKeepCnt = 200
+            if (signalChannelKeyPairL.hasData() || signalChannelKeyPairR.hasData()) {
+                val (train, direction) = getCollidedTrainData()
+                var subjectFlag = false
+                if (train != null) {
+                    subjectFlag = if (subjectFormationRegex == "") {
+                        true
                     } else {
-                        channelData.setTrainData(ModCommonVar.notfindTrainLevel, (-1).toByte(), -1L, direction)
-                        if (lastCollidedTrainFormationIDKeepCnt > 0) {
-                            lastCollidedTrainFormationIDKeepCnt--
-                        } else if (lastCollidedTrainFormationIDKeepCnt == 0) {
-                            lastCollidedTrainFormationID = -1
-                            lastCollidedTrainFormationIDKeepCnt = -1
-                        }
+                        val formationNumber = FormationNumberCore.getOrMake(train.formation.id)
+                        formationNumber.keyString.matches(Regex(subjectFormationRegex))
+                    }
+                }
+
+                if (train != null && subjectFlag) {
+                    if (lastCollidedTrainFormationID != train.formation.id) {
+                        lastCollidedTrainFormationID = train.formation.id
+                        ATC2Core.setATC2ChannelKeyData(
+                            lastCollidedTrainFormationID,
+                            signalChannelKeyPairL,
+                            turnOutChannelKeyPair,
+                            signalChannelKeyPairR,
+                            this.worldObj.isRemote
+                        )
+                        lastCollidedTrainFormationIDKeepCnt = 200
+                    }
+                } else {
+                    if (lastCollidedTrainFormationIDKeepCnt > 0) {
+                        lastCollidedTrainFormationIDKeepCnt--
+                    } else if (lastCollidedTrainFormationIDKeepCnt == 0) {
+                        lastCollidedTrainFormationID = -1
+                        lastCollidedTrainFormationIDKeepCnt--
                     }
                 }
             }
@@ -118,7 +156,7 @@ class EntityTrainDetectorAdvance(world: World?) : EntityElectricalWiring(world),
         return boundingBox
     }
 
-    fun getCollidedTrainData(): Pair<EntityTrainBase?, EnumDirection> {
+    private fun getCollidedTrainData(): Pair<EntityTrainBase?, EnumDirection> {
         if (worldObj == null) {
             return Pair(null, EnumDirection.Null)
         }
@@ -198,6 +236,10 @@ class EntityTrainDetectorAdvance(world: World?) : EntityElectricalWiring(world),
         }
     }
 
+    fun dropItems() {
+        entityDropItem(ItemStack(ModKEIProductFamily.itemATC2Transmitter), 0.0f)
+    }
+
     override fun moveEntity(par1: Double, par3: Double, par5: Double) {}
 
     override fun addVelocity(par1: Double, par3: Double, par5: Double) {}
@@ -206,7 +248,7 @@ class EntityTrainDetectorAdvance(world: World?) : EntityElectricalWiring(world),
         if (player.heldItem == null || player.heldItem.item !is ItemWire) {
             if (worldObj.isRemote) {
                 player.openGui(
-                    ModKEIProductFamily.instance, GuiIDs.GuiID_EntityTrainDetectorSetting, worldObj,
+                    ModKEIProductFamily.instance, GuiIDs.GuiID_ATC2TransmitterEntitySetting, worldObj,
                     entityId, 0, 0
                 )
             }
@@ -215,51 +257,12 @@ class EntityTrainDetectorAdvance(world: World?) : EntityElectricalWiring(world),
         return super.interactFirst(player)
     }
 
-    override fun getElectricity(): Int {
-        return if (findTrain) ModCommonVar.findTrainLevel.level else ModCommonVar.notfindTrainLevel.level
+    override fun getPickedResult(target: MovingObjectPosition?): ItemStack? {
+        return getItem()
     }
 
-    private val signalLevel: SignalLevel
-        get() = if (findTrain) ModCommonVar.findTrainLevel else ModCommonVar.notfindTrainLevel
-
-    override fun setElectricity(par1: Int) {}
-
-    override fun dropItems() {
-        entityDropItem(ItemStack(ModKEIProductFamily.itemTrainDetectorAdvance), 0.0f)
-    }
-
-    private var myModelSet: ModelSetMachine? = null
-    override fun getModelSet(): ModelSetMachine? {
-        if (myModelSet == null || myModelSet!!.isDummy) {
-            val machineConfig = MachineConfig()
-            val model = ModelConfig.ModelSource()
-            model.modelFile = "ATC01.mqo"
-            model.textures = arrayOf(arrayOf("default","textures/advanceTrainDetector.png", ""))
-            machineConfig.model = model
-            machineConfig.buttonTexture = "textures/button_AdvanceTrainDetector_01.png"
-            machineConfig.machineType = "Antenna_Receive"
-            machineConfig.tags = "kuma_ya"
-            machineConfig.doCulling = true
-            machineConfig.accuracy = "LOW"
-            myModelSet = ModelSetMachineClient(machineConfig)
-
-            if (worldObj == null || !worldObj.isRemote) {
-                PacketNBT.sendToClient(this)
-            }
-        }
-        return myModelSet
-    }
-
-    override fun getSubType(): String {
-        return "Antenna_Receive"
-    }
-
-    override fun getDefaultName(): String {
-        return "TrainDetector_01"
-    }
-
-    override fun getItem(): ItemStack {
-        return ItemStack(ModKEIProductFamily.itemTrainDetectorAdvance)
+    private fun getItem(): ItemStack {
+        return ItemStack(ModKEIProductFamily.itemATC2Transmitter)
     }
 
     init {
@@ -268,6 +271,6 @@ class EntityTrainDetectorAdvance(world: World?) : EntityElectricalWiring(world),
     }
 
     override fun getName(): String {
-        return "EntityTrainDetectorAdvance"
+        return "ATC2TransmitterEntity"
     }
 }

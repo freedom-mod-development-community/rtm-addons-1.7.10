@@ -10,6 +10,7 @@ import keiproductfamily.rtmAddons.EnumTurnOutSyncSelection
 import keiproductfamily.rtmAddons.detectorChannel.EnumDirection
 import keiproductfamily.rtmAddons.detectorChannel.RTMDetectorChannelMaster
 import keiproductfamily.rtmAddons.receiverBlock.receiverTrafficLights.ReceiverTrafficLightTile
+import keiproductfamily.rtmAddons.signalchannel.RTMSignalChannelMaster
 import keiproductfamily.rtmAddons.turnoutChannel.RTMTurnoutChannelMaster
 import keiproductfamily.setChannelKeyPair
 import net.minecraft.nbt.NBTTagCompound
@@ -48,6 +49,7 @@ class ReceiverTrafficLightTileType2 : ReceiverTrafficLightTile() {
         this.forceSelectSignal = forceSelectSignal
         RTMDetectorChannelMaster.reCallList(this)
         RTMTurnoutChannelMaster.reCallList(this)
+        shareAndPutCallList()
         this.markDirtyAndNotify()
         isUpdate = true
     }
@@ -118,6 +120,7 @@ class ReceiverTrafficLightTileType2 : ReceiverTrafficLightTile() {
                         }
                     }
                     electricityAuto = obstructionIndexSignalMap[obstructionIndexSignalMap.size - 1].level
+                    shareAndPutCallList()
                     return true
                 }
             }
@@ -137,6 +140,7 @@ class ReceiverTrafficLightTileType2 : ReceiverTrafficLightTile() {
             val newValue = nowSide.toEnumTurnOutSyncSelection()
             if (nowTurnOutSwitch2 != newValue) {
                 nowTurnOutSwitch2 = newValue
+                shareAndPutCallList()
                 changeNotify()
             }
             return true
@@ -153,13 +157,13 @@ class ReceiverTrafficLightTileType2 : ReceiverTrafficLightTile() {
         val newOnRailMap = HashMap<SignalLevel, Long>()
         val newIndexSignalMap = ArrayList<SignalLevel>()
         val newSignalIndexMap = HashMap<SignalLevel, Int>()
-        for ((index, pair) in detectorChannelKeys.withIndex()) {
+        for ((signalIndex, pair) in detectorChannelKeys.withIndex()) {
             if (pair.hasData()) {
-                val signalLevel = SignalLevel.getSignal(index + 1)
+                val signalLevel = SignalLevel.getSignal(signalIndex + 1)
                 newOnRailMap[signalLevel] = obstructionOnRailMap[signalLevel] ?: -1
-                val index = newIndexSignalMap.size
+                val newMapIndex = newIndexSignalMap.size
                 newIndexSignalMap.add(signalLevel)
-                newSignalIndexMap[signalLevel] = index
+                newSignalIndexMap[signalLevel] = newMapIndex
             }
         }
         obstructionOnRailMap = newOnRailMap
