@@ -28,6 +28,7 @@ buildscript {
 
 plugins {
     id "com.dorongold.task-tree" version "1.3.1"
+    id 'com.github.johnrengelman.shadow' version '6.1.0'
 }
 
 apply plugin: 'forge'
@@ -59,8 +60,8 @@ configurations {
 }
 
 dependencies {
-    shade "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-    shade "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
+    shadow "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    shadow "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
     def tasks = ["runClient", "build"]
     if (!project.gradle.startParameter.taskNames.stream().anyMatch { tasks.contains(it) }) {
         compileOnly files("$projectDir/${minecraft.runDir}/mods/Optifine-generated.jar")
@@ -94,13 +95,20 @@ processResources
     }
 }
 
+shadowJar {
+    archiveClassifier.set('')
+    configurations = [project.configurations.shadow]
+    exclude '**/*.kotlin_metadata'
+    exclude 'META-INF', 'META-INF/**'
+
+    from file("LICENSE")
+    from file("NOTICE")
+    relocate 'kotlin', 'keiproductfamily.libs.kotlin'
+}
+
 jar {
-    configurations.shade.each { dep ->
-        from(project.zipTree(dep)) {
-            exclude '**/*.kotlin_metadata'
-            exclude 'META-INF', 'META-INF/**'
-        }
-    }
+    dependsOn shadowJar
+    enabled = false
 }
 compileJava {
     options.sourcepath = null
