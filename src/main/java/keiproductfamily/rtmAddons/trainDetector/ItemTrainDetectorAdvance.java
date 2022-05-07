@@ -2,9 +2,6 @@ package keiproductfamily.rtmAddons.trainDetector;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import jp.ngt.rtm.electric.MachineType;
-import jp.ngt.rtm.entity.EntityInstalledObject;
-import jp.ngt.rtm.item.ItemWithModel;
 import jp.ngt.rtm.rail.TileEntityLargeRailBase;
 import jp.ngt.rtm.rail.util.RailMap;
 import keiproductfamily.ModKEIProductFamily;
@@ -25,7 +22,7 @@ public class ItemTrainDetectorAdvance extends Item implements IParmission {
     private IIcon icon;
 
     public ItemTrainDetectorAdvance() {
-        this.setHasSubtypes(true);
+        setHasSubtypes(true);
         setUnlocalizedName("itemTrainDetectorAdvance");
         setTextureName(ModKEIProductFamily.DOMAIN + ":itemTrainDetectorAdvance");
         setCreativeTab(ModKEIProductFamily.keipfCreativeTabs);
