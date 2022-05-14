@@ -2,7 +2,6 @@ package keiproductfamily.rtmAddons.tablet
 
 import jp.kaiz.kaizpatch.util.KeyboardUtil
 import jp.ngt.ngtlib.gui.GuiScreenCustom
-import jp.ngt.rtm.entity.train.util.Formation
 import keiproductfamily.network.PacketHandler
 import keiproductfamily.rtmAddons.GuiTextFieldWithID
 import keiproductfamily.rtmAddons.atc2.ATC2Cli
@@ -124,7 +123,7 @@ class RTMTabletGui(val player: EntityPlayer, val formationID: Long) : GuiScreenC
     }
 
     protected fun setTextFieldWithID(id: Int, xPos: Int, yPos: Int, w: Int, h: Int, maxStringLength: Int, text: String?): GuiTextFieldWithID {
-        val field = GuiTextFieldWithID(id, fontRendererObj, xPos, yPos, w, h)
+        val field = GuiTextFieldWithID(id, fontRendererObj, xPos, yPos, w, h, this)
         field.maxStringLength = maxStringLength
         field.isFocused = false
         field.text = text

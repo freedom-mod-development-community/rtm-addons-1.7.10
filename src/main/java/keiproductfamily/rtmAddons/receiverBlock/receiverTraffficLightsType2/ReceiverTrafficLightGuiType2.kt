@@ -153,7 +153,7 @@ class ReceiverTrafficLightGuiType2(private val tile: ReceiverTrafficLightTileTyp
 
     override fun onTextFieldClicked(field: GuiTextField) {}
     protected fun setTextFieldWithID(id: Int, xPos: Int, yPos: Int, w: Int, h: Int, text: String?): GuiTextFieldWithID {
-        val field = GuiTextFieldWithID(id, fontRendererObj, xPos, yPos, w, h)
+        val field = GuiTextFieldWithID(id, fontRendererObj, xPos, yPos, w, h, this)
         field.maxStringLength = 32767
         field.isFocused = false
         field.text = text
