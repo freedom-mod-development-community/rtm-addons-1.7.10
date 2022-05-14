@@ -2,9 +2,6 @@ package keiproductfamily.rtmAddons.atc2.transmitter
 
 import cpw.mods.fml.relauncher.Side
 import cpw.mods.fml.relauncher.SideOnly
-import jp.ngt.rtm.electric.MachineType
-import jp.ngt.rtm.entity.EntityInstalledObject
-import jp.ngt.rtm.item.ItemWithModel
 import jp.ngt.rtm.rail.TileEntityLargeRailBase
 import keiproductfamily.ModKEIProductFamily
 import keiproductfamily.PermissionList.IParmission
@@ -80,9 +77,9 @@ class ATC2TransmitterItem : Item(), IParmission {
                     x.toDouble() + 0.5,
                     y.toDouble() + 0.5,
                     z.toDouble() + 0.5,
-                    block.stepSound.func_150496_b(),
+                    block.stepSound.placeSound,
                     (block.stepSound.getVolume() + 1.0f) / 2.0f,
-                    block.stepSound.pitch * 0.8f
+                    block.stepSound.frequency * 0.8f
                 )
                 --itemStack.stackSize
             }

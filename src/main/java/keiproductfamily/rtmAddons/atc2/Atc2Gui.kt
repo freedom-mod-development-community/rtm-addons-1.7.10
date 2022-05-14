@@ -13,7 +13,6 @@ import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.gui.ScaledResolution
 import net.minecraftforge.client.event.GuiScreenEvent
 import net.minecraftforge.client.event.RenderGameOverlayEvent
-import kotlin.properties.Delegates
 
 @SideOnly(Side.CLIENT)
 object Atc2Gui : GuiScreen() {
@@ -84,7 +83,7 @@ object Atc2Gui : GuiScreen() {
     }
 
     private fun renderTrainGui(train: EntityTrainBase) {
-        val fontrenderer = this.mc.fontRenderer
+        val fontrenderer = this.mc.fontRendererObj
         val model = train.modelSet
         if (model != null && !model.config.notDisplayCab) {
             val k = width / 2

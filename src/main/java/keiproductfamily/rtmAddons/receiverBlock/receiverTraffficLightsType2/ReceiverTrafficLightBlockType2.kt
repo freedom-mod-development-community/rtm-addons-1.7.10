@@ -16,8 +16,8 @@ import net.minecraft.world.World
 
 class ReceiverTrafficLightBlockType2 : BlockContainer(Material.rock) , IBlockConnective, IParmission {
     init {
-        setBlockName("ReceiverTrafficLightType2")
-        setBlockTextureName(ModKEIProductFamily.DOMAIN + ":receivertrafficlighttype2")
+        unlocalizedName = "ReceiverTrafficLightType2"
+        setTextureName(ModKEIProductFamily.DOMAIN + ":receivertrafficlighttype2")
         setCreativeTab(ModKEIProductFamily.keipfCreativeTabs)
     }
 
@@ -25,7 +25,7 @@ class ReceiverTrafficLightBlockType2 : BlockContainer(Material.rock) , IBlockCon
         val tile = world.getTileEntity(x, y, z)
         if (tile is ReceiverTrafficLightTileType2) {
             val item = player.heldItem?.item as? ItemBlock
-            if(item != null && item.field_150939_a is ReceiverTrafficLightBlock){
+            if(item != null && item.blockInstance is ReceiverTrafficLightBlock){
                 val nbt = NBTTagCompound()
                 world.getTileEntity(x, y, z).writeToNBT(nbt)
                 world.setBlock(x, y, z, ModCommonVar.receiverTrafficLightBlock)

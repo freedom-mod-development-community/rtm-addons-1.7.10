@@ -18,7 +18,6 @@ import keiproductfamily.rtmAddons.ChannelKeyPair
 import keiproductfamily.rtmAddons.RequestEntityNBTData
 import keiproductfamily.rtmAddons.detectorChannel.EnumDirection
 import keiproductfamily.rtmAddons.detectorChannel.RTMDetectorChannelMaster
-import net.minecraft.entity.Entity
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.init.Blocks
 import net.minecraft.item.ItemStack
@@ -186,9 +185,9 @@ class EntityTrainDetectorAdvance(world: World?) : EntityElectricalWiring(world),
                         posX,
                         posY,
                         posZ,
-                        block.stepSound.func_150496_b(),
+                        block.stepSound.placeSound,
                         (block.stepSound.getVolume() + 1.0f) / 2.0f,
-                        block.stepSound.pitch * 0.8f
+                        block.stepSound.frequency * 0.8f
                     )
                     setDead()
                 }
@@ -234,7 +233,7 @@ class EntityTrainDetectorAdvance(world: World?) : EntityElectricalWiring(world),
             val machineConfig = MachineConfig()
             val model = ModelConfig.ModelSource()
             model.modelFile = "ATC01.mqo"
-            model.textures = arrayOf(arrayOf("default","textures/advanceTrainDetector.png", ""))
+            model.textures = arrayOf(arrayOf("default", "textures/advanceTrainDetector.png", ""))
             machineConfig.model = model
             machineConfig.buttonTexture = "textures/button_AdvanceTrainDetector_01.png"
             machineConfig.machineType = "Antenna_Receive"

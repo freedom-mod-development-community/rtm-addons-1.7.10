@@ -224,9 +224,9 @@ class ATC2TransmitterEntity(world: World) : Entity(world), IParmission {
                         posX,
                         posY,
                         posZ,
-                        block.stepSound.func_150496_b(),
+                        block.stepSound.placeSound,
                         (block.stepSound.getVolume() + 1.0f) / 2.0f,
-                        block.stepSound.pitch * 0.8f
+                        block.stepSound.frequency * 0.8f
                     )
                     setDead()
                 }

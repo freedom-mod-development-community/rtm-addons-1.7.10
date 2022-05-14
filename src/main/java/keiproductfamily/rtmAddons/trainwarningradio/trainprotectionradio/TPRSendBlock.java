@@ -16,8 +16,8 @@ import net.minecraft.world.World;
 public class TPRSendBlock extends BlockContainer implements IParmission {
     public TPRSendBlock() {
         super(Material.iron);
-        setBlockName("TPRSendBlock");
-        setBlockTextureName(ModKEIProductFamily.DOMAIN + ":TPRSendBlock");
+        setUnlocalizedName("TPRSendBlock");
+        setTextureName(ModKEIProductFamily.DOMAIN + ":TPRSendBlock");
         setCreativeTab(ModKEIProductFamily.keipfCreativeTabs);
     }
 
@@ -49,7 +49,7 @@ public class TPRSendBlock extends BlockContainer implements IParmission {
 
     @Override
     @SideOnly(Side.CLIENT)
-    public void registerBlockIcons(IIconRegister p_149651_1_) {
+    public void registerIcons(IIconRegister p_149651_1_) {
         this.blockIconOn = p_149651_1_.registerIcon(ModKEIProductFamily.DOMAIN + ":TPRSendBlock_On");
         this.blockIconOff = p_149651_1_.registerIcon(ModKEIProductFamily.DOMAIN + ":TPRSendBlock_Off");
         this.blockIconSend = p_149651_1_.registerIcon(ModKEIProductFamily.DOMAIN + ":TPRSendBlock_Send");

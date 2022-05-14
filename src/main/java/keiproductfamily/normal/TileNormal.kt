@@ -21,6 +21,6 @@ abstract class TileNormal : TileEntity() {
     }
 
     override fun onDataPacket(net: NetworkManager?, pkt: S35PacketUpdateTileEntity) {
-        readFromNBT(pkt.func_148857_g())
+        readFromNBT(pkt.nbtCompound)
     }
 }

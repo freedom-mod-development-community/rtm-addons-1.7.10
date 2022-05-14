@@ -18,8 +18,8 @@ import net.minecraftforge.common.util.ForgeDirection;
 public class TAWReceiveBlock extends BlockContainer implements IParmission {
     public TAWReceiveBlock() {
         super(Material.iron);
-        setBlockName("TAWReceiveBlock");
-        setBlockTextureName(ModKEIProductFamily.DOMAIN + ":TAWReceiveBlock");
+        setUnlocalizedName("TAWReceiveBlock");
+        setTextureName(ModKEIProductFamily.DOMAIN + ":TAWReceiveBlock");
         setCreativeTab(ModKEIProductFamily.keipfCreativeTabs);
     }
 
@@ -74,7 +74,7 @@ public class TAWReceiveBlock extends BlockContainer implements IParmission {
 
     @Override
     @SideOnly(Side.CLIENT)
-    public void registerBlockIcons(IIconRegister p_149651_1_) {
+    public void registerIcons(IIconRegister p_149651_1_) {
         this.blockIconOn = p_149651_1_.registerIcon(ModKEIProductFamily.DOMAIN + ":TAWReceiveBlock_On");
         this.blockIconOff = p_149651_1_.registerIcon(ModKEIProductFamily.DOMAIN + ":TAWReceiveBlock_Off");
         this.blockIconReceive = p_149651_1_.registerIcon(ModKEIProductFamily.DOMAIN + ":TAWReceiveBlock_Receive");

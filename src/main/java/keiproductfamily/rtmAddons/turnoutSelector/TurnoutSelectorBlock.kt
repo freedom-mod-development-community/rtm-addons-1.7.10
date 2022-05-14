@@ -17,8 +17,8 @@ import net.minecraft.world.World
 
 class TurnoutSelectorBlock() : BlockContainer(Material.rock), IParmission {
     init {
-        setBlockName("TurnoutSelector")
-        setBlockTextureName(ModKEIProductFamily.DOMAIN + ":turnoutselector")
+        unlocalizedName = "TurnoutSelector"
+        setTextureName(ModKEIProductFamily.DOMAIN + ":turnoutselector")
         setCreativeTab(ModKEIProductFamily.keipfCreativeTabs)
     }
 
@@ -42,7 +42,7 @@ class TurnoutSelectorBlock() : BlockContainer(Material.rock), IParmission {
         } else {
             val tile = world.getTileEntity(x, y, z)
             if (tile is TurnoutSelectorTile) {
-                if(!tile.worldObj.isRemote) {
+                if(!tile.world.isRemote) {
                     tile.nextTurnOutSelection()
                 }
                 return true

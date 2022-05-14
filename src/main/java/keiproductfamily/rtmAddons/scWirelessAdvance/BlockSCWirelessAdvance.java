@@ -31,7 +31,7 @@ public class BlockSCWirelessAdvance extends BlockContainer implements IBlockConn
 
     public BlockSCWirelessAdvance() {
         super(Material.rock);
-        setBlockName("SCWirelessAdvance");
+        setUnlocalizedName("SCWirelessAdvance");
         setCreativeTab(ModKEIProductFamily.keipfCreativeTabs);
     }
 
@@ -91,7 +91,7 @@ public class BlockSCWirelessAdvance extends BlockContainer implements IBlockConn
 
     @Override
     @SideOnly(Side.CLIENT)
-    public void registerBlockIcons(IIconRegister register) {
+    public void registerIcons(IIconRegister register) {
         this.icon = register.registerIcon(ModKEIProductFamily.DOMAIN + ":SCWirelessAdvance");//wireless
     }
 

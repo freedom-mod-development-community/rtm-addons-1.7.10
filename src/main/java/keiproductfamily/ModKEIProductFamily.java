@@ -45,7 +45,7 @@ import net.minecraftforge.event.world.WorldEvent;
 
 import java.util.List;
 
-@Mod(modid = ModKEIProductFamily.MOD_ID, name = "Kuma Electric Industry Product Family", version = Constants.version, dependencies = "after:RTM")
+@Mod(modid = ModKEIProductFamily.MOD_ID, name = "Kuma Electric Industry Product Family", dependencies = "after:RTM")
 public class ModKEIProductFamily {
     public static final String MOD_ID = "KEIProductFamily";
     public static final String DOMAIN = "keiproductfamily";

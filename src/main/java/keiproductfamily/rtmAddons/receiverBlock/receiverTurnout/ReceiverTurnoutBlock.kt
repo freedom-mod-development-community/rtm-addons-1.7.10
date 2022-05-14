@@ -21,8 +21,8 @@ import kotlin.properties.Delegates
 
 class ReceiverTurnoutBlock : BlockContainer(Material.rock) , IBlockConnective, IParmission {
     init {
-        setBlockName("ReceiverTurnout")
-        setBlockTextureName(ModKEIProductFamily.DOMAIN + ":receiverturnout")
+        unlocalizedName = "ReceiverTurnout"
+        setTextureName(ModKEIProductFamily.DOMAIN + ":receiverturnout")
         setCreativeTab(ModKEIProductFamily.keipfCreativeTabs)
     }
 
@@ -66,7 +66,7 @@ class ReceiverTurnoutBlock : BlockContainer(Material.rock) , IBlockConnective, I
     protected var blockIconFront: IIcon by Delegates.notNull()
 
     @SideOnly(Side.CLIENT)
-    override fun registerBlockIcons(p_149651_1_: IIconRegister) {
+    override fun registerIcons(p_149651_1_: IIconRegister) {
         blockIcon = p_149651_1_.registerIcon(ModKEIProductFamily.DOMAIN + ":receiverturnout")
         blockIconFront = p_149651_1_.registerIcon(ModKEIProductFamily.DOMAIN + ":receiverturnoutfront")
     }
