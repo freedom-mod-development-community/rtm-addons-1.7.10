@@ -30,12 +30,15 @@ repositories {
 val shade by configurations.creating
 configurations.implementation.get().extendsFrom(shade)
 
+val kaizVersionName = "v1.4.6"
+val kaizJarName = "src1.7.10_20200822+KaizPatchX-1.4.6.jar"
 
-val kaizObfJar = buildDir.resolve("kaiz-patch/KaizPatchX.jar")
-val kaizDevJar = buildDir.resolve("kaiz-patch/KaizPatchX-dev.jar")
-val downloadKaizPatchX by tasks.creating {
+//val kaizObfJar = buildDir.resolve("kaiz-patch/KaizPatchX.jar")
+val kaizObfJar = buildDir.resolve("kaiz-patch/$kaizJarName")
+val kaizDevJar = buildDir.resolve("kaiz-patch/$kaizJarName-debof.jar")//File("$projectDir/libs/KaizPatchX-$kaizVersionName-dev.jar")
+val downloadKaizPatchX: Task by tasks.creating {
     val url =
-        uri("https://github.com/Kai-Z-JP/KaizPatchX/releases/download/v1.4.6/src1.7.10_20200822+KaizPatchX-1.4.6.jar")
+        uri("https://github.com/Kai-Z-JP/KaizPatchX/releases/download/$kaizVersionName/$kaizJarName")
     outputs.file(kaizObfJar)
     inputs.property("url", url)
     doLast {
@@ -57,6 +60,9 @@ val deobfKaizPatchX by tasks.creating(com.anatawa12.modPatching.source.Deobfusca
 
     dependsOn(downloadKaizPatchX)
 }
+
+//tasks.compileKotlin.get().dependsOn(deobfKaizPatchX)
+//tasks.sourceMainJava.get().dependsOn(deobfKaizPatchX)
 
 dependencies {
     shade(kotlin("stdlib-jdk8"))
