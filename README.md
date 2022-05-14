@@ -7,3 +7,6 @@ Place the jar in the mods folder.
 
 # Dependencies
 KaizPatch (Unofficial modifications of RTM) : https://github.com/Kai-Z-JP/KaizPatchX
+
+Put the debof version jar of KaizPatch in the libs folder. (Automatic download feature is in the process of implementation)
+Clone the KaizPatch repository from github, run the jar task, and copy [KaizPatch-X-###-dev.jar] in build/libs to the libs folder of rtm-addon.
