@@ -20,7 +20,7 @@ group = project.property("group").toString()
 minecraft {
     version = "${project.property("minecraft_version")}-${project.property("forge_version")}"
     runDir = "run"
-    mappings = "stable_9"
+    mappings = "snapshot_20140908"
 }
 
 repositories {
@@ -58,16 +58,16 @@ val deobfKaizPatchX by tasks.creating(com.anatawa12.modPatching.source.Deobfusca
     sourceJar.set(kaizObfJar)
     destination.set(kaizDevJar)
 
-    dependsOn(downloadKaizPatchX)
+    //dependsOn(downloadKaizPatchX)
 }
 
-//tasks.compileKotlin.get().dependsOn(deobfKaizPatchX)
-//tasks.sourceMainJava.get().dependsOn(deobfKaizPatchX)
+tasks.compileKotlin.get().dependsOn(deobfKaizPatchX)
+tasks.sourceMainJava.get().dependsOn(deobfKaizPatchX)
 
 dependencies {
     shade(kotlin("stdlib-jdk8"))
     //mcpMappingConfig("de.oceanlabs.mcp:mcp_snapshot:20140908-1.7.10@zip")
-    mcpMappingConfig("de.oceanlabs.mcp:mcp_stable:9-1.7.10@zip")
+    mcpMappingConfig("de.oceanlabs.mcp:mcp_snapshot:20140908-1.7.10@zip")
     implementation(files(kaizDevJar).builtBy(deobfKaizPatchX))
 
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
