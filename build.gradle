@@ -19,7 +19,7 @@ buildscript {
             exclude group: 'trove', module: 'trove'
         }
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        classpath 'com.anatawa12:compile-time-constant:1.0.1'
+        classpath 'com.anatawa12:compile-time-constant:1.0.5'
     }
     tasks.withType(JavaCompile) {
         options.encoding = "UTF-8"
