@@ -28,7 +28,7 @@ buildscript {
 
 plugins {
     id "com.dorongold.task-tree" version "2.1.0"
-    id 'com.github.johnrengelman.shadow' version '6.1.0'
+    id 'com.github.johnrengelman.shadow' version '7.1.2'
 }
 
 apply plugin: 'forge'
