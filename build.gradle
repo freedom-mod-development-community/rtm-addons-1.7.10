@@ -67,7 +67,7 @@ dependencies {
         compileOnly files("$projectDir/${minecraft.runDir}/mods/Optifine-generated.jar")
     }
     testImplementation 'junit:junit:4.13.2'
-    testImplementation "io.mockk:mockk:1.12.4"
+    testImplementation "io.mockk:mockk:1.13.3"
     compile fileTree(dir: 'libs', include: ['*.jar'])
 }
 
